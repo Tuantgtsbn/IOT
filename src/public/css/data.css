@@ -1,0 +1,29 @@
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f6f5fa;
+}
+
+.parent {
+  margin: 32px;
+  width: 100%;
+}
+
+.choice {
+  display: flex;
+  justify-content: space-between;
+}
+
+.list-field {
+  width: 200px;
+}
+
+.search .form-search {
+  display: flex;
+}
+.search #search {
+  margin-right: 16px;
+}
+
+/*# sourceMappingURL=data.css.map */

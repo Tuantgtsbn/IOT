@@ -1,0 +1,259 @@
+<div class="content container">
+  <div class="parent dashboard">
+    <div class="row row-first justify-content-between">
+      <div class="div1 col-12 col-md-3 box box-temparature">
+        <div class="box_header">
+          <h2 class="title">Temparature</h2>
+        </div>
+        <div class="box_body">
+          <h1 class="value" data-id="1" data-unit="celcius" data-field="Temparature">Loading...</h1>
+        </div>
+        <div class="box_footer connected">
+          <p class="status ">Loading...</p>
+        </div>
+
+      </div>
+      <div class="div2 col-12 col-md-3 box box-humidity">
+        <div class="box_header">
+          <h2 class="title">Humidity</h2>
+        </div>
+        <div class="box_body">
+          <h1 class="value" data-id="1" data-unit="percent" data-field="Humidity">Loading</h1>
+        </div>
+        <div class="box_footer connected">
+          <p class="status ">Loading...</p>
+        </div>
+      </div>
+      <div class="div3 col-12 col-md-3 box box-gas">
+        <div class="box_header">
+          <h2 class="title">Gas</h2>
+        </div>
+        <div class="box_body">
+          <h1 class="value" data-id="2" data-unit="ppm" data-field="Gas">Loading</h1>
+        </div>
+        <div class="box_footer disconnected">
+          <p class="status ">Loading...</p>
+        </div>
+      </div>
+    </div>
+    <div class="row row-second justify-content-between ">
+
+      <div class="div4 col-12 col-md-8 box box-chart">
+        <div class="menu-chart">
+          <button class="btn btn-secondary" type="button" data-id="1" data-unit="celcius" data-field="Temparature">
+            Temparature
+          </button>
+          <button class="btn btn-success" type="button" data-id="1" data-unit="percent" data-field="Humidity">
+            Humidity
+          </button>
+          <button class="btn btn-warning" type="button" data-id="2" data-unit="ppm" data-field="Gas">
+            Gas
+          </button>
+        </div>
+        <canvas id="ecgChart" width="600" height="300"></canvas>
+      </div>
+      <div class="div5 col-12 col-md-3">
+          <div class="control-panel">
+            <p class="control-panel-heading">Control panel</p>
+            <div class="control-panel-body">
+              <div class="control-panel-body__device row" data-id="4">
+                <p class="control-panel-body__device-name col-12"></p>
+                
+                <div class="control-panel-body__device-status col">
+                  <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div class="control-panel-body__device-action col">
+                  <button class="btn btn-primary" data-id="4"></button>
+              
+                </div>
+                
+
+              </div>
+            </div>
+
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- views/yourPage.handlebars -->
+<script>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const valueTemparature = document.querySelector('.box-temparature .value');
+    const valueHumidity = document.querySelector('.box-humidity .value');
+    const valueGas = document.querySelector('.box-gas .value');
+    const valueStatusTemparature = document.querySelector('.box-temparature .status');
+    const valueStatusHumidity = document.querySelector('.box-humidity .status');
+    const valueStatusGas = document.querySelector('.box-gas .status');
+    const sensorId = [valueTemparature.getAttribute('data-id'), valueHumidity.getAttribute('data-id'), valueGas.getAttribute('data-id')];
+    const sensorUnit = [valueTemparature.getAttribute('data-unit'), valueHumidity.getAttribute('data-unit'), valueGas.getAttribute('data-unit')];
+    const arrValueDevices = [valueTemparature, valueHumidity, valueGas];
+    const arrStatusDevices = [valueStatusTemparature, valueStatusHumidity, valueStatusGas];
+
+    // get status devices
+    document.querySelectorAll('.control-panel-body__device').forEach(device => {
+      fetch(`http://localhost:8080/api/devices/${device.getAttribute('data-id')}`)
+        .then(response => response.json())
+        .then(data => {
+          device.setAttribute('data-status', data.status);  
+          device.querySelector('.control-panel-body__device-name').innerHTML = `${data.name} <span class="device-position">${data.position}</span>`;
+          device.querySelector('.control-panel-body__device-action button').textContent = data.status ? 'ON' : 'OFF';
+          device.querySelector('.device-position').textContent = data.position;
+          device.querySelector('.control-panel-body__device-status').classList.toggle('device_actived', data.status);
+          device.querySelector('.control-panel-body__device-action').addEventListener('click', async (event) => {
+            
+            
+            let status=event.currentTarget.parentElement.getAttribute('data-status')=='0'?false:true;
+            console.log(status);
+      
+
+            const message = await switchDevice(data.id, !status);
+            if(message.status!=null){
+              device.setAttribute('data-status', message.status?'1':'0');
+              device.querySelector('.control-panel-body__device-action button').textContent = message.status ? 'ON' : 'OFF';
+              device.querySelector('.control-panel-body__device-status').classList.toggle('device_actived', message.status);
+            }else{
+              alert('Message: '+message.message);
+            }
+            
+          })
+        });
+    })
+
+    // switch on/off devices
+    async function switchDevice(deviceId, status) {
+      console.log(deviceId, status);
+      const responese = await fetch(`http://localhost:8080/api/devices/${deviceId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: status?1:0 })
+      });
+      return responese.json();
+    }
+    function getLatestValue() {
+      for (let i = 0; i < arrValueDevices.length; i++) {
+        fetch(`http://localhost:8080/api/sensorsData/${sensorId[i]}/${sensorUnit[i]}/latest`)
+          .then(response => response.json())
+          .then(data => {
+            const unit = data.unit;
+            switch (unit) {
+              case 'celsius':
+                arrValueDevices[i].textContent = `${data.value} °C`;
+                break;
+              case 'percent':
+                arrValueDevices[i].textContent = `${data.value} %`;
+                break;
+              case 'ppm':
+                arrValueDevices[i].textContent = `${data.value} ppm`;
+                break;
+              default:
+                arrValueDevices[i].textContent = data.value;
+                break;
+            }
+            arrStatusDevices[i].textContent = !!data.status ? 'Connected' : 'Disconnected';
+          });
+
+      }
+    }
+    getLatestValue();
+    setInterval(getLatestValue, 5000);
+    let dataId =1;
+    let dataUnit = 'celcius';
+    let dataField = 'Temparature';
+    let ecgChart;
+    // Lua chon bieu do
+    document.querySelectorAll('.menu-chart button').forEach(button => {
+      button.addEventListener('click', () => {
+      dataId = button.getAttribute('data-id');
+      dataUnit = button.getAttribute('data-unit');
+      dataField = button.getAttribute('data-field');
+        if (ecgChart) {
+          ecgChart.destroy();
+        }
+        showChart(dataId, dataUnit,dataField);
+      })
+    });
+    let idInterval;
+    //show chart
+    function showChart(dataId, dataUnit, field) {
+      fetch(`http://localhost:8080/api/sensorsData/${dataId}/${dataUnit}/latestTen`)
+        .then(response => response.json())
+        .then(data => {
+          const labels = data.map(item => {
+            let time = item.created_at.split('T')[1].split('.')[0];
+            return time;
+          })
+          const length = data.length;
+          const config = {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: `ECG Data ${field}`,
+                  data: data.map(item => item.value),
+                  borderColor: 'rgba(75,192,192,1)',
+                  borderWidth: 1.5,
+                  fill: false,
+                  tension: 0.1
+                }
+              ]
+            },
+            options: {
+              scales: {
+                x: {
+                  display: true,
+                  title: {
+                    display: true,
+                    text: 'Time'
+                  }
+                },
+                y: {
+                  display: true,
+                  title: {
+                    display: true,
+                    text: `${field} (${dataUnit})`
+                  }
+                }
+
+              },
+              
+            }
+          };
+          const ctx = document.getElementById('ecgChart').getContext('2d');
+          clearInterval(idInterval);
+          ecgChart = new Chart(ctx, config);
+          if(ecgChart) {
+            idInterval=setInterval(() => {
+            updateChart(dataId, dataUnit);
+          }, 5000);
+          }
+        })
+
+    }
+    showChart(dataId, dataUnit, dataField);
+    // update chart
+    function updateChart (dataId, dataUnit) {
+      fetch(`http://localhost:8080/api/sensorsData/${dataId}/${dataUnit}/latestTen`)
+        .then(response => response.json())
+        .then(data => {
+          ecgChart.data.labels = data.map(item => {
+            let time = item.created_at.split('T')[1].split('.')[0];
+            return time;
+          });
+          ecgChart.data.datasets[0].data = data.map(item => item.value);
+          ecgChart.update('none');
+        })
+    }
+    
+
+    
+    
+  });
+</script>

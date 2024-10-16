@@ -1,0 +1,15 @@
+@charset "UTF-8";
+.footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #000; /* Màu nền nhẹ, bạn có thể thay đổi */
+  font-size: 14px; /* Kích thước chữ nhỏ */
+  color: #fff; /* Màu chữ nhẹ */
+  /* position: fixed; */
+  width: 100%;
+}
+.footer p {
+  margin: 0;
+}
+
+/*# sourceMappingURL=footer.css.map */

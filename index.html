@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiển thị Dữ liệu DHT11</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #data {
+            text-align: center;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hiển thị Dữ liệu</h1>
+    <div>
+        <h2>Nhiệt độ</h2>
+        <p id="dataTemperature">Đang chờ dữ liệu...</p>
+    </div>
+    <div>
+        <h2>Độ ẩm</h2>
+        <p id="dataHumidity">Đang chờ dữ liệu...</p>
+    </div>
+    <div>
+        <h2>Khí gas</h2>
+        <p id="dataGas">Đang chờ dữ liệu...</p>
+    </div>
+
+
+    <script>
+        const temperatureShow = document.getElementById('dataTemperature');
+        const humidityShow = document.getElementById('dataHumidity');
+        const gasShow = document.getElementById('dataGas'); 
+        const ws = new WebSocket('ws://localhost:8080'); // Địa chỉ WebSocket server
+
+        ws.onopen = () => {
+            console.log('Kết nối WebSocket thành công');
+        };
+
+        ws.onmessage = (event) => {
+            console.log('Dữ liệu mới:', event);
+            const data = JSON.parse(event.data);
+            switch(data.type) {
+                case 'temperature':
+                    temperatureShow.textContent = data.value;
+                    break;
+                case 'humidity':
+                    humidityShow.textContent = data.value;
+                    break;
+                case 'gas':
+                    gasShow.textContent = data.value;
+                    break;
+                default:
+                    console.log('Không xác định được kiểu dữ liệu');
+                    break;
+            }
+        };
+
+        ws.onclose = () => {
+            console.log('Kết nối WebSocket đã ngắt');
+        };
+
+        ws.onerror = (error) => {
+            console.log('Lỗi WebSocket:', error);
+        };
+    </script>
+</body>
+</html>

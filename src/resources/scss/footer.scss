@@ -1,0 +1,13 @@
+.footer {
+    text-align: center;
+  padding: 20px;
+  background-color: #000; /* Màu nền nhẹ, bạn có thể thay đổi */
+  font-size: 14px; /* Kích thước chữ nhỏ */
+  color: #fff; /* Màu chữ nhẹ */
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  p {
+    margin: 0;
+  }
+}

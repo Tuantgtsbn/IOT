@@ -1,0 +1,53 @@
+<header class="header">
+    <nav class="navbar navbar-expand-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="/img/Logo.jpg" alt="">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="collapsibleNavbar">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/data">Data</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/action">Action</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/information">Information</a>
+                    </li>
+                    
+
+                </ul>
+                <div class="avatar">
+                    <span class="oi oi-person avatar_icon"></span>
+                    <div id="avatar_menu">
+                        <a href="#">
+                            <span class="oi oi-info"></span>
+                            Profile</a>
+                        <a href="#">
+                            <span class="oi oi-account-logout"></span>
+                            Logout</a>
+
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </nav>
+</header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const avatar_icon = document.querySelector('.avatar_icon');
+        const avatar_menu = document.querySelector('#avatar_menu');
+        avatar_icon.addEventListener('click', function () {
+            avatar_menu.classList.toggle('active');
+        })
+    })
+</script>
