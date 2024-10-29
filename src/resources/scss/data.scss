@@ -9,14 +9,14 @@
     margin: 32px;
     width: 100%;
   }
+  .heading {
+    font-size: 2rem;
+  }
   .choice {
     display: flex;
     justify-content: space-between;
   }
-  .list-field{
-    width:200px;
-    
-  }
+ 
   .search {
     .form-search {
         display: flex;

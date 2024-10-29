@@ -1,18 +1,20 @@
 <div class="container content">
     <div class="parent dashboard">
         <p class="heading">Statistics</p>
-        <div class="choice">
-            <div class="list-field">
+        <div class="choice row">
+            <div class="list-field col-4 col-md-3">
+                <label for="field" class="form-label"> Select filter</label>
                 <select name="field" id="field" class="form-select">
-                    <option value="0" >Select field</option>
-                    <option value="1">Temparature</option>
+                    <option value="" selected>All</option>
+                    <option value="1">Temperature</option>
                     <option value="2">Humidity</option>
                     <option value="3">Gas</option>
                 </select>
             </div>
-            <div class="search">
+            <div class="search col-8 col-md-3">
+                <label for="date-search" class="form-label">Date</label>
                 <form action="" class="form-search">
-                    <input type="text" name="search" id="search" class="form-control" placeholder="Enter your value">
+                    <input type="date" name="search" id="date-search" class="form-control me-2">
                     <button type="submit" class="btn btn-primary">Search</button>
                 </form>
             </div>
@@ -22,21 +24,168 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
+
+                        <th scope="col">STT</th>
                         <th scope="col">Date</th>
                         <th scope="col">Value</th>
                         <th scope="col">Unit</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
-                    <tr>
+
+                    {{!-- <tr>
                         <td>2024</td>
                         <td>34</td>
                         <td>celcius</td>
-                    </tr>
-                    
+                    </tr> --}}
+
                 </tbody>
             </table>
         </div>
+
+        <div class="col-12">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center list-number-pages">
+
+
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
+
+<script>
+   
+    document.addEventListener('DOMContentLoaded', function () {
+        const queries = {
+            idDevice: '',
+            limit: 20,
+            page: '',
+            time: '',
+        }
+        let currentPage = 1;
+        const field = document.querySelector('#field');
+        const time = document.querySelector('#date-search');
+        field.addEventListener('change', (event) => {
+            queries.idDevice = event.target.value;
+            queries.page = 1;
+            const queryString = new URLSearchParams(queries).toString();
+            currentPage = 1;
+            updateTable(queryString);
+        });
+        time.addEventListener('change', (event) => {
+            queries.time = event.target.value;
+            queries.page = 1;
+            const queryString = new URLSearchParams(queries).toString();
+            currentPage = 1;
+            updateTable(queryString);
+        });
+
+// Hàm cập nhật bảng dữ liệu
+function updateTable(queryString) {
+    fetch(`http://localhost:8080/api/sensorsData?${queryString}`)
+        .then(response => response.json())
+        .then(data => {
+            const table = document.querySelector('.table-data tbody');
+            if(data.message){
+                table.innerHTML = `<tr><td colspan="3">${data.message}</td></tr>`;
+            
+            }else {
+                const dataLength = data.result.length;
+            const totalPage = data.totalPage;
+            currentPage = data.currentPage;
+            table.innerHTML = ''; // Xóa nội dung cũ của bảng
+
+            // Lặp qua kết quả và hiển thị lên bảng
+            for (let i = 0; i < dataLength; i++) {
+                const tr = document.createElement('tr');
+                const stt = document.createElement('td');
+                const date = document.createElement('td');
+                const value = document.createElement('td');
+                const unit = document.createElement('td');
+                stt.textContent = queries.limit * (currentPage - 1) + i + 1;
+                date.textContent = data.result[i].created_at.split('.')[0].replace('T', ' ');
+                value.textContent = data.result[i].value;
+                unit.textContent = data.result[i].unit;
+                tr.appendChild(stt);
+                tr.appendChild(date);
+                tr.appendChild(value);
+                tr.appendChild(unit);
+                table.appendChild(tr);
+            }
+
+            // Cập nhật phân trang
+            renderPagination(totalPage, currentPage);
+            }
+            
+        });
+}
+
+// Hàm xử lý chuyển trang
+function changePage(page) {
+    if (page === 'Previous' && currentPage > 1) {
+        currentPage--;
+    } else if (page === 'Next') {
+        currentPage++;
+    } else if (typeof page === 'number') {
+        currentPage = page;
+    }
+
+    // Cập nhật query và gọi lại API để cập nhật bảng
+    queries.page = currentPage;
+    const queryString = new URLSearchParams(queries).toString();
+    updateTable(queryString);
+}
+
+// Hàm tạo phân trang
+function renderPagination(totalPages, currentPage) {
+    const list_pages = document.querySelector('.list-number-pages');
+    let html = '';
+
+    // Nút Previous
+    html += `<li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="Previous">Previous</a>
+            </li>`;
+
+    // Các số trang
+    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        html += `<li class="page-item ${currentPage === i ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                 </li>`;
+    }
+
+    // Nút Next
+    html += `<li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="Next">Next</a>
+            </li>`;
+
+    list_pages.innerHTML = html;
+
+    // Gán sự kiện click cho từng liên kết phân trang
+    const pageLinks = document.querySelectorAll('.page-link');
+    pageLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault(); // Ngăn điều hướng
+            const page = event.target.getAttribute('data-page');
+            if (page === 'Previous' || page === 'Next') {
+                changePage(page);
+            } else {
+                changePage(Number(page));
+            }
+        });
+    });
+}
+
+// Lần đầu tiên tải bảng và phân trang
+queries.page = currentPage;
+const queryString = new URLSearchParams(queries).toString();
+updateTable(queryString);
+
+
+        
+
+
+
+        
+    });
+</script>

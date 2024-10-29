@@ -14,16 +14,8 @@
   font-size: 2rem;
 }
 
-.choice {
-  display: flex;
-  justify-content: space-between;
+label {
+  font-weight: bold;
 }
 
-.search .form-search {
-  display: flex;
-}
-.search #search {
-  margin-right: 16px;
-}
-
-/*# sourceMappingURL=data.css.map */
+/*# sourceMappingURL=alert.css.map */

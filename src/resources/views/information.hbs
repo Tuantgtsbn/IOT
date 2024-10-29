@@ -1,0 +1,45 @@
+<div class="container content">
+    <div class="parent information">
+        <p class="heading">List devices</p>
+
+        <p class="number-devices"></p>
+        <div class="list-devices row">
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event)=> {
+        const listDevices = document.querySelector('.list-devices');
+        const numberDevices = document.querySelector('.number-devices');
+        const url = 'http://localhost:8080/api/devices';
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                
+                numberDevices.textContent = `Number of devices: ${data.length}`;
+                data.forEach(device => {
+                    const deviceElement = document.createElement('div');
+                    deviceElement.classList.add('device', 'card', 'col-12', 'col-md-4');
+                    const srcImg = `/img/${device.src}`;
+                    deviceElement.innerHTML = `
+                        <img src="${srcImg}" class="device-img">
+                        <div class="card-body device-information ">
+                            <h5 class="card-title">${device.name}</h5>
+                            <p class="card-text">Position: ${device.position}</p>
+                            <p class="card-text">Type: ${device.type}</p>
+                            <p class="card-text">Created at: ${formatTime(device.created_at)}</p>
+                            <p class="card-text">Status: ${device.status ? 'Connect' : 'Disconnect'}</p>
+                            
+                        </div>
+                    `;
+                    listDevices.appendChild(deviceElement);
+                })
+            })
+
+        
+    })
+    function formatTime(stringTime) {
+    return stringTime.split('T')[1].split('.')[0];
+}
+</script>

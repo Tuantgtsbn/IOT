@@ -1,7 +1,7 @@
 <header class="header">
     <nav class="navbar navbar-expand-sm">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/">
                 <img src="/img/Logo.jpg" alt="">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
@@ -19,20 +19,28 @@
                         <a class="nav-link" href="/action">Action</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="/alert">Alert</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/information">Information</a>
                     </li>
+                    
                     
 
                 </ul>
                 <div class="avatar">
                     <span class="oi oi-person avatar_icon"></span>
                     <div id="avatar_menu">
+                        <p class="m-0 text-center">
+                            {{username}}
+                        </p>
                         <a href="#">
                             <span class="oi oi-info"></span>
                             Profile</a>
-                        <a href="#">
+                        <a href="/logout">
                             <span class="oi oi-account-logout"></span>
-                            Logout</a>
+                            Logout
+                        </a>
 
                     </div>
                 </div>

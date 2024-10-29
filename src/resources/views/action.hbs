@@ -1,0 +1,183 @@
+<div class="container content">
+    <div class="parent action">
+        <p class="heading">History Actions</p>
+        <div class="choice row justify-content-between">
+            <div class="list-field col-4 col-md-3">
+                <label for="field" class="form-label"> Select Device</label>
+                <select name="field" id="field" class="form-select">
+                    <option value="" selected>All</option>
+                    <option value="5">LED1</option>
+                    <option value="4">Điều hòa</option>
+                </select>
+            </div>
+            <div class="search col-8 col-md-3">
+                <label for="date-search" class="form-label">Date</label>
+                <form action="" class="form-search d-flex">
+                    <input type="date" name="search" id="date-search" class="form-control me-2">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-data">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+
+                        <th scope="col">STT</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Device</th>
+                        
+
+                        <th scope="col">Type</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {{!-- <tr>
+                        <td>2024</td>
+                        <td>34</td>
+                        <td>celcius</td>
+                    </tr> --}}
+
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-12">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center list-number-pages">
+
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const queries = {
+            idDevice: '',
+            limit: 20,
+            page: '',
+            date: ''
+        }
+        let currentPage =1;
+        const field = document.querySelector('#field');
+        const time = document.querySelector('#date-search');
+
+        field.addEventListener('change', function (e) {
+            queries.idDevice = e.target.value;
+            queries.page = 1;
+            const queryString = new URLSearchParams(queries).toString();
+            currentPage = 1;
+            updateTable(queryString);
+        })
+
+        time.addEventListener('change', function (e) {
+            queries.time = e.target.value;
+            const queryString = new URLSearchParams(queries).toString();
+            queries.page = 1;
+            currentPage = 1;
+            updateTable(queryString);
+
+        })
+
+        function updateTable (queryString) {
+            fetch(`http://localhost:8080/api/actions?${queryString}`)
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.querySelector('.table-data tbody');
+                    if(data.message){
+                        table.innerHTML = `<tr><td colspan="5">${data.message}</td></tr>`;
+                    }else{
+                        currentPage = data.currentPage;
+                        const dataLength = data.result.length;
+                        const totalPages = data.totalPage;
+                        table.innerHTML = '';
+                        for(let i =0; i<dataLength; i++){
+                            console.log(data.result[i]);
+                            const tr = document.createElement('tr');
+                            const stt = document.createElement('td');
+                            const device = document.createElement('td');
+                            const date = document.createElement('td');
+                            
+                            const type = document.createElement('td');
+                            const status = document.createElement('td');
+                            stt.textContent = queries.limit * (currentPage - 1) + i + 1;
+                            date.textContent = data.result[i].created_at.split('.')[0].replace('T', ' ');
+                            device.textContent = data.result[i].name;
+                            
+                            type.textContent = data.result[i].action_type ? 'Turn on' : 'Turn off';
+
+                            status.textContent = data.result[i].status ? 'Success' : 'Fail';
+                            tr.style.backgroundColor = data.result[i].status ? '#4bd36f' : '#fe3939';
+                            tr.appendChild(stt);
+                            tr.appendChild(date);
+                            tr.appendChild(device);
+                            
+                            tr.appendChild(type);
+                            tr.appendChild(status);
+                            table.appendChild(tr);
+                        }
+                        renderPagination(totalPages, currentPage);
+                    }
+                    
+                })
+        }
+        function changePage(page){
+            if(page === 'Previous'){
+                currentPage--;
+            }else if(page === 'Next'){
+                currentPage++;
+            }else{
+                currentPage = page;
+            }
+            // Cập nhật query và gọi lại API để cập nhật bảng
+    queries.page = currentPage;
+    const queryString = new URLSearchParams(queries).toString();
+    updateTable(queryString);
+        }
+        function renderPagination(totalPages, currentPage) {
+            const list_pages = document.querySelector('.list-number-pages');
+            let html = '';
+
+    // Nút Previous
+            html += `<li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="Previous">Previous</a>
+            </li>`;
+
+    // Các số trang
+            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                html += `<li class="page-item ${currentPage === i ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                 </li>`;
+            }
+
+    // Nút Next
+            html += `<li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="Next">Next</a>
+            </li>`;
+
+            list_pages.innerHTML = html;
+
+    // Gán sự kiện click cho từng liên kết phân trang
+            const pageLinks = document.querySelectorAll('.page-link');
+            pageLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                event.preventDefault(); // Ngăn điều hướng
+                const page = event.target.getAttribute('data-page');
+                if (page === 'Previous' || page === 'Next') {
+                    changePage(page);
+                } else {
+                    changePage(Number(page));
+                }
+                });
+            });
+        }
+        queries.page = currentPage;
+        updateTable(new URLSearchParams(queries).toString());
+})
+</script>

@@ -1,3 +1,4 @@
+drop database smarthome;
 create database smarthome;
 use smarthome;
 CREATE TABLE users (
@@ -37,6 +38,7 @@ create table action (
     id_device int,
     id_user int,
     action_type boolean default 0,
+    status boolean default 1,
     created_at timestamp default current_timestamp,
     foreign key(id_device) references devices(id),
     foreign key(id_user) references users(id)
@@ -59,63 +61,65 @@ insert into users (username,password,email) values
 ('thanhtung','123456','thanhtung@gmail.com');
 
 insert into type(type) values 
-('DHT11'),
+('Nhiệt độ'),
+('Độ ẩm'),
 ('MQ2'),
 ('LED'),
-('FAN');
+('Điều hòa');
 
 insert into devices(id_type, position, name, status) values
-(1,'Phòng ngủ tầng 2','Cảm biến DHT11-01',1),
-(2,'Bếp tâng 1','Cảm biến MQ2-01',1),
-(4,'Phòng ngủ tầng 2','Quạt',0),
-(3,'Phòng ngủ tâng 2','Đèn',0);
+(1,'Phòng ngủ tầng 2','Cảm biến Nhiệt độ-01',1),
+(2,'Phòng ngủ tầng 2', 'Cảm biến Độ ẩm-01',1),
+(3,'Bếp tâng 1','Cảm biến MQ2-01',1),
+(4,'Phòng ngủ tầng 2','Điều hòa',0),
+(5,'Phòng ngủ tâng 2','Đèn',0);
 
 insert into sensors_data (id_device, value, unit) value
-(1, 46, 'celcius'),
-(1, 55, 'percent'),
+(1, 46, 'celsius'),
+(2, 55, 'percent'),
+(3, 244,'ppm'),
+(1, 47, 'celsius'),
+(2, 56, 'percent'),
+(3, 260,'ppm'),
+(1, 22, 'celsius'),
+(2, 44, 'percent'),
+(3, 244,'ppm'),
+(1, 46, 'celsius'),
+(2, 50, 'percent'),
+(3, 246,'ppm'),
+(1, 46, 'celsius'),
+(2, 55, 'percent'),
+(3, 244,'ppm'),
+(1, 22, 'celsius'),
+(2, 23, 'percent'),
+(3, 210,'ppm'),
+(1, 11, 'celsius'),
+(2, 44, 'percent'),
+(3, 290,'ppm'),
+(1, 46, 'celsius'),
+(2, 55, 'percent'),
 (2, 244,'ppm'),
-(1, 47, 'celcius'),
-(1, 56, 'percent'),
-(2, 260,'ppm'),
-(1, 22, 'celcius'),
-(1, 44, 'percent'),
-(2, 244,'ppm'),
-(1, 46, 'celcius'),
-(1, 50, 'percent'),
-(2, 246,'ppm'),
-(1, 46, 'celcius'),
-(1, 55, 'percent'),
-(2, 244,'ppm'),
-(1, 22, 'celcius'),
-(1, 23, 'percent'),
-(2, 210,'ppm'),
-(1, 11, 'celcius'),
-(1, 44, 'percent'),
-(2, 290,'ppm'),
-(1, 46, 'celcius'),
-(1, 55, 'percent'),
-(2, 244,'ppm'),
-(1, 46, 'celcius'),
-(1, 55, 'percent'),
-(2, 244,'ppm'),
-(1, 46, 'celcius'),
-(1, 55, 'percent'),
-(2, 244,'ppm')
+(1, 46, 'celsius'),
+(2, 55, 'percent'),
+(3, 244,'ppm'),
+(1, 46, 'celsius'),
+(2, 55, 'percent'),
+(3, 244,'ppm')
 ;
 
-insert into action (id_device, id_user, action_type) values
-(4,1,1),
-(3,1,0),
-(4,1,1),
-(3,1,0),
-(3,2,1);
 
+insert into action (id_device, id_user, action_type) values
+(5,1,1),
+(5,1,0),
+(5,1,1),
+(5,1,0),
+(5,2,1);
+insert into action (id_device, id_user, action_type,status) value
+(5,1,0,0)
+;
 insert into alerts (id_device, message) values 
 (2, 'Lỗi kêt nối'),
-(1, 'Lỗi kết nối'),
-(2, 'Phát hiện ra khói'),
-(3, 'Lỗi kết nối'),
+(5, 'Lỗi kết nối'),
+(3, 'Phát hiện ra khói'),
+(4, 'Lỗi kết nối'),
 (1, 'Cảm biến nhiệt độ bị lỗi');
-
-
-

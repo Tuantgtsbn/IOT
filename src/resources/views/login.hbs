@@ -1,0 +1,49 @@
+<div class="content row justify-content-center">
+    <div class="img col-8">
+        
+    </div>
+    <div class="login col-8 col-md-4">
+        <div class="logo">
+        <img src="/img/Logo.jpg" alt="logo">
+        </div>
+        <div class="center">
+            <h2>Welcome to SmartHome</h2>
+            <h3>Sign into your account</h3>
+            <form action="/login" method="POST" onsubmit="handleSubmit">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="text" id="email" class="form-control" name="email" placeholder="name@gmail.com" value="{{email}}"required>
+                {{# if errorEmail}}
+
+                <p class="error">*{{errorEmail}}</p>
+                {{/if}}
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Password" value="{{password}}"required>
+                {{# if errorPassword}}
+                <p class="error">*{{errorPassword}}</p>
+                {{/if}}
+                <button type="submit" class="btn btn-primary mt-2">Login</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        function handleSubmit (event) {
+            event.preventDefault();
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: form.email.value,
+                    password: form.password.value
+                })
+            }).then(response => response.json())
+            .then(data => console.log(data.message))
+            
+            
+        }
+    })
+</script>

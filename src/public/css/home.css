@@ -14,6 +14,9 @@
   border-radius: 10px;
   background-color: #fff;
   padding: 0;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 }
 
 .box_header .title {
@@ -43,33 +46,40 @@
   margin: 0;
   font-size: 1.5rem;
 }
-.row-second{
+
+.row-second {
   margin-top: 32px;
 }
-/*# sourceMappingURL=home.css.map */
-.menu-chart {
-  button {
-    width: 110px;
-  }
+
+.control-panel {
+  border-radius: 10px;
+  padding: 8px 16px;
+  background-color: #fff;
 }
 
-.control-panel{
-  background-color: #fff;
-  border-radius: 10px;
+.control-panel-body__device-status {
+  text-align: center;
   font-size: 1.5rem;
-  padding: 8px 16px;
-  .control-panel-body__device-name{
-    border-bottom: 2px solid #000;
-  }
-  .control-panel-body__device-status {
-    text-align: center;
-    color: #000;
-    
-  }
 }
-.device_actived{
-  color: yellow !important;
+
+.control-panel-body__device-action {
+  text-align: center;
 }
-.device-position {
-  font-size: 12px;
+
+.device_actived {
+  color: yellow;
 }
+
+.box-chart {
+  justify-content: flex-start;
+}
+
+.control-panel-body__device-action {
+  display: none;
+}
+
+#automatic {
+  margin-right: 16px;
+}
+
+/*# sourceMappingURL=home.css.map */

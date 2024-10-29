@@ -14,16 +14,14 @@
   font-size: 2rem;
 }
 
-.choice {
-  display: flex;
-  justify-content: space-between;
+.number-devices {
+  font-size: 1.5rem;
 }
 
-.search .form-search {
-  display: flex;
-}
-.search #search {
-  margin-right: 16px;
+.list-devices .device img {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 5px;
 }
 
-/*# sourceMappingURL=data.css.map */
+/*# sourceMappingURL=information.css.map */
