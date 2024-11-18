@@ -24,7 +24,7 @@ const server = app.listen(PORT, () => {
 const db = require('./config/db');
 db.connectToDatabase();
 const { sessionConfig } = require('./config/session');
-// app.use(sessionConfig);
+app.use(sessionConfig);
 routes(app);
 
 
@@ -93,14 +93,14 @@ wss.on('connection', (ws) => {
                         });
                         break;
                     case 'toggleDevice':
-                        var { currentStatus, idDevice, isSuccess } = data;
+                        var { currentStatus, idDevice, idUser, isSuccess } = data;
                         if (!!isSuccess) {
                             var sql = `Update devices set status = ?, last_updated=current_timestamp where id = ?`;
                             db.query(sql, [currentStatus, idDevice]);
 
                         }
-                        sql = `Insert into action (id_device, action_type, status) values (?, ?, ?)`;
-                        db.query(sql, [idDevice, currentStatus, isSuccess]);
+                        sql = `Insert into action (id_device, id_user, action_type, status) values (?, ?, ?, ?)`;
+                        db.query(sql, [idDevice, idUser, currentStatus, isSuccess]);
                         wss.clients.forEach((client) => {
                             if (client.clientType === 'browser') {
                                 client.send(JSON.stringify({ type: 'toggleDevice', currentStatus, idDevice, isSuccess }));
@@ -119,7 +119,12 @@ wss.on('connection', (ws) => {
                         if (idDevice === 3 && m == 'Detect smoke !!!') {
                             fetch('https://api.telegram.org/bot7442157649:AAG-BdVqGkKyztVoLWRpJyMN0UB4vPlXrIA/sendMessage?chat_id=6160625198&text=warning gas in the kitchen')
                                 .then(response => response.json())
-                                .then(data => console.log(data));
+                                .then(data => console.log(data))
+                                .catch(error => console.error('Error:', error));
+                            fetch('https://hooks.zapier.com/hooks/catch/20559867/29zccwh/')
+                                .then(response => response.json())
+                                .then(data => console.log(data))
+                                .catch(error => console.error('Error:', error));
                         }
 
                         break;
@@ -139,10 +144,10 @@ wss.on('connection', (ws) => {
                 console.log('Received from browser:', data);
                 switch (data.type) {
                     case 'toggleDevice':
-                        var { idDevice, currentStatus } = data;
+                        var { idDevice, currentStatus, idUser } = data;
                         wss.clients.forEach((client) => {
                             if (client.clientType === 'esp8266') {
-                                client.send(JSON.stringify({ type: 'toggleDevice', currentStatus, idDevice }));
+                                client.send(JSON.stringify({ type: 'toggleDevice', currentStatus, idUser, idDevice }));
                             }
                         });
                         break;
@@ -163,6 +168,7 @@ wss.on('connection', (ws) => {
 
     ws.on('close', () => {
         if (ws.clientType === 'esp8266') {
+            console.log('ESP8266 disconnected');
             isESP8266Connected = false;
             wss.clients.forEach((client) => {
                 if (client.readyState === WebSocket.OPEN && client.clientType === 'browser') {

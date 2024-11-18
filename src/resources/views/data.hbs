@@ -69,15 +69,15 @@
         field.addEventListener('change', (event) => {
             queries.idDevice = event.target.value;
             queries.page = 1;
-            const queryString = new URLSearchParams(queries).toString();
             currentPage = 1;
+            const queryString = new URLSearchParams(queries).toString();
             updateTable(queryString);
         });
         time.addEventListener('change', (event) => {
             queries.time = event.target.value;
             queries.page = 1;
-            const queryString = new URLSearchParams(queries).toString();
             currentPage = 1;
+            const queryString = new URLSearchParams(queries).toString();
             updateTable(queryString);
         });
 
@@ -88,7 +88,8 @@ function updateTable(queryString) {
         .then(data => {
             const table = document.querySelector('.table-data tbody');
             if(data.message){
-                table.innerHTML = `<tr><td colspan="3">${data.message}</td></tr>`;
+                table.innerHTML = `<tr><td colspan="4">${data.message}</td></tr>`;
+                document.querySelector('.list-number-pages').innerHTML = '';
             
             }else {
                 const dataLength = data.result.length;

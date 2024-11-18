@@ -110,6 +110,7 @@
                     const table = document.querySelector('.table-data tbody');
                     if(data.message){
                         table.innerHTML = `<tr><td colspan="5">${data.message}</td></tr>`;
+                        document.querySelector('.list-number-pages').innerHTML = '';
                     }else{
                         currentPage = data.currentPage;
                     const dataLength = data.result.length;

@@ -2,20 +2,28 @@ const { query } = require('../../config/db');
 const SiteController = {
     // [GET] /
     home(req, res) {
-        res.render('home', { layout: 'main', 'title': 'Home', 'css': '/css/home.css' });
+        res.render('home', { layout: 'main', 'title': 'Home', 'css': '/css/home.css', username: req.session.username, idUser: req.session.userId });
     },
     // [GET] /data
     data(req, res) {
-        res.render('data', { layout: 'main', 'title': 'Data', 'css': '/css/data.css' });
+        res.render('data', { layout: 'main', 'title': 'Data', 'css': '/css/data.css', username: req.session.username, idUser: req.session.userId });
     },
     action(req, res) {
-        res.render('action', { layout: 'main', 'title': 'Action', 'css': '/css/data.css' });
+        res.render('action', { layout: 'main', 'title': 'Action', 'css': '/css/data.css', username: req.session.username, idUser: req.session.userId });
     },
     information(req, res) {
-        res.render('information', { layout: 'main', 'title': 'Information', 'css': '/css/information.css' });
+        res.render('information', { layout: 'main', 'title': 'Information', 'css': '/css/information.css', username: req.session.username, idUser: req.session.userId });
     },
     login(req, res) {
         res.render('login', { layout: 'noheaderfooter', 'title': 'Login', 'css': '/css/login.css' });
+    },
+    async alert(req, res) {
+        fetch('http://localhost:8080/api/devices')
+            .then(response => response.json())
+            .then(result => {
+                res.render('alert', { layout: 'main', 'title': 'Alter', 'css': '/css/alert.css', devices: result, username: req.session.username, idUser: req.session.userId });
+
+            })
     },
     // [POST] /login
     async postLogin(req, res) {
@@ -50,14 +58,7 @@ const SiteController = {
             res.redirect('/login');
         });
     },
-    async alert(req, res) {
-        fetch('http://localhost:8080/api/devices')
-            .then(response => response.json())
-            .then(result => {
-                res.render('alert', { layout: 'main', 'title': 'Alter', 'css': '/css/alert.css', devices: result });
 
-            })
-    }
 
 };
 

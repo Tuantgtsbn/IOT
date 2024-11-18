@@ -16,7 +16,7 @@ const sessionConfig = session({
     resave: false,               // Không lưu lại session nếu không thay đổi
     saveUninitialized: false,    // Không lưu session nếu chưa được khởi tạo
     cookie: {
-        maxAge: 1000 * 60 * 60,    // Thời gian hết hạn cookie (15 phút)
+        maxAge: 1000 * 60 * 15,    // Thời gian hết hạn cookie (15 phút)
         httpOnly: true,            // Ngăn trình duyệt truy cập cookie từ JavaScript
         secure: false              // Đặt thành true nếu sử dụng HTTPS
     }

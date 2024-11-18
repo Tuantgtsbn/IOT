@@ -30,6 +30,8 @@
                         
 
                         <th scope="col">Type</th>
+                        <th scope="col">Who</th>
+
                         <th scope="col">Status</th>
                     </tr>
                 </thead>
@@ -71,16 +73,16 @@
         field.addEventListener('change', function (e) {
             queries.idDevice = e.target.value;
             queries.page = 1;
-            const queryString = new URLSearchParams(queries).toString();
             currentPage = 1;
+            const queryString = new URLSearchParams(queries).toString();
             updateTable(queryString);
         })
 
         time.addEventListener('change', function (e) {
             queries.time = e.target.value;
-            const queryString = new URLSearchParams(queries).toString();
             queries.page = 1;
             currentPage = 1;
+            const queryString = new URLSearchParams(queries).toString();
             updateTable(queryString);
 
         })
@@ -92,6 +94,7 @@
                     const table = document.querySelector('.table-data tbody');
                     if(data.message){
                         table.innerHTML = `<tr><td colspan="5">${data.message}</td></tr>`;
+                        document.querySelector('.list-number-pages').innerHTML = '';
                     }else{
                         currentPage = data.currentPage;
                         const dataLength = data.result.length;
@@ -105,13 +108,14 @@
                             const date = document.createElement('td');
                             
                             const type = document.createElement('td');
+                            const user = document.createElement('td');
                             const status = document.createElement('td');
                             stt.textContent = queries.limit * (currentPage - 1) + i + 1;
                             date.textContent = data.result[i].created_at.split('.')[0].replace('T', ' ');
-                            device.textContent = data.result[i].name;
+                            device.textContent = data.result[i].device;
                             
                             type.textContent = data.result[i].action_type ? 'Turn on' : 'Turn off';
-
+                            user.textContent = data.result[i].user;
                             status.textContent = data.result[i].status ? 'Success' : 'Fail';
                             tr.style.backgroundColor = data.result[i].status ? '#4bd36f' : '#fe3939';
                             tr.appendChild(stt);
@@ -119,6 +123,7 @@
                             tr.appendChild(device);
                             
                             tr.appendChild(type);
+                            tr.appendChild(user);
                             tr.appendChild(status);
                             table.appendChild(tr);
                         }
@@ -139,7 +144,7 @@
     queries.page = currentPage;
     const queryString = new URLSearchParams(queries).toString();
     updateTable(queryString);
-        }
+    }
         function renderPagination(totalPages, currentPage) {
             const list_pages = document.querySelector('.list-number-pages');
             let html = '';

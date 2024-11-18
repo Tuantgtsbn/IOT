@@ -19,6 +19,7 @@ create table devices (
     id_type INT,
     position varchar(255),
     name varchar(255),
+    src varchar(255),
     status boolean default 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -36,9 +37,9 @@ CREATE TABLE sensors_data (
 create table action (
 	id int auto_increment primary key,
     id_device int,
-    id_user int,
     action_type boolean default 0,
     status boolean default 1,
+    id_user int default 1,
     created_at timestamp default current_timestamp,
     foreign key(id_device) references devices(id),
     foreign key(id_user) references users(id)
@@ -48,12 +49,13 @@ create table action (
 CREATE TABLE alerts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_device int,
-    message TEXT,                
+    message TEXT, 
+    isSafe BOOLEAN DEFAULT 0,               
     is_resolved BOOLEAN DEFAULT 0, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     foreign key (id_device) references devices(id)
 );
-
+insert into users (username) values ('esp8266');
 insert into users (username,password,email) values
 ('minhtuan','123456','minhtuan@gmail.com'),
 ('anhthu','123456','anhthu@gmail.com'),
@@ -114,12 +116,11 @@ insert into action (id_device, id_user, action_type) values
 (5,1,1),
 (5,1,0),
 (5,2,1);
-insert into action (id_device, id_user, action_type,status) value
-(5,1,0,0)
-;
+
 insert into alerts (id_device, message) values 
 (2, 'Lỗi kêt nối'),
 (5, 'Lỗi kết nối'),
 (3, 'Phát hiện ra khói'),
 (4, 'Lỗi kết nối'),
 (1, 'Cảm biến nhiệt độ bị lỗi');
+

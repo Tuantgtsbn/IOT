@@ -229,6 +229,7 @@
 
 <!-- views/yourPage.handlebars -->
 <script>
+const idUser = `{{idUser}}`;
   var isESPCONNECTED = false;
   document.addEventListener('DOMContentLoaded', function () {
     const valueTemperature = document.querySelector('.box-temperature .value');
@@ -259,6 +260,7 @@
     }
     ws.onmessage = function (message) {
       const data = JSON.parse(message.data);
+      console.log(data.type);
       switch (data.type) {
         case 'dataSensor':
           var { value, unit, idDevice } = data;
@@ -385,6 +387,7 @@
               }
             }
           }
+          break;
         default:
           throw new Error('Invalid type');
         
@@ -405,7 +408,7 @@
       const idDevice = device.getAttribute('data-id');
       button.addEventListener('click', () => {
         const status = button.classList.contains('connected');
-        ws.send(JSON.stringify({ type: 'toggleDevice', idDevice, currentStatus: status ? 1 : 0 }));
+        ws.send(JSON.stringify({ type: 'toggleDevice', idUser ,idDevice, currentStatus: status ? 1 : 0 }));
       });
     });
 
