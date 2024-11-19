@@ -121,7 +121,7 @@ wss.on('connection', (ws) => {
                                 .then(response => response.json())
                                 .then(data => console.log(data))
                                 .catch(error => console.error('Error:', error));
-                            fetch('https://hooks.zapier.com/hooks/catch/20559867/29zccwh/')
+                            fetch('https://hooks.zapier.com/hooks/catch/20774506/2r81pnf/')
                                 .then(response => response.json())
                                 .then(data => console.log(data))
                                 .catch(error => console.error('Error:', error));
