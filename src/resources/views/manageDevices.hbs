@@ -1,0 +1,138 @@
+<div class="container content">
+    <div class="parent manage">
+        <p class="heading">List devices avaiable</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Device</th>
+                    <th>Positon</th>
+                    <th>Satus</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+    
+</div>
+
+<div class="toast-container position-absolute top-0 end-0 p-3"></div>
+
+
+<script>
+    const idUser = `{{idUser}}`;
+    const sensorDevices = [];
+    const controlDevices = [];
+    const tbody = document.querySelector('tbody');
+    const toastContainer = document.querySelector('.toast-container');
+    const renderDevices = (devices) => {
+        tbody.innerHTML = '';
+        devices.forEach((device, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${device.name}</td>
+                <td>${device.position}</td>
+                <td>${device.idUser ? 'Đã kết nối' : 'Chưa kết nối'}</td>
+                <td>
+                    ${device.idUser ? `<button class="btn btn-danger" onclick="subUnsubDevice(${device.id},${idUser},'unsub')">Hủy kết nối</button>` : `<button class="btn btn-primary" onclick="subUnsubDevice(${device.id},${idUser},'sub')">Kết nối</button>`}
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    const allDevices = JSON.parse(localStorage.getItem('allDevices'));
+    if (allDevices.length ==0) {
+        tbody.innerHTML = `<tr><td colspan="5">Không có thiết bị nào</td></tr>`;
+    }else {
+        renderDevices(allDevices);
+    }
+    
+
+    function showToast(message,color, duration = 3000) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.style.backgroundColor = `#${color}`;
+        toast.classList.add("show");
+    
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, duration);
+    }
+    function createElementToast(message,color,duration){
+        const toast = document.createElement('div');
+        toast.classList.add('toast','show');
+        toast.setAttribute('role','alert');
+        toast.setAttribute('aria-live','assertive');
+        toast.setAttribute('aria-atomic','true');
+        if(duration) toast.setAttribute('data-bs-delay',duration);
+        toast.innerHTML = `
+            <div class="toast-header">
+                <strong class="me-auto">Thông báo</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" style="background-color:${color}">
+                ${message.toUpperCase()}
+            </div>
+        `;
+        toastContainer.appendChild(toast);
+        new bootstrap.Toast(toast).show();
+        toast.addEventListener('hidden.bs.toast',function(){
+            toast.remove();
+        })
+    }
+    function subUnsubDevice (idDevice,idUser,action) {
+        const element = event.target.parentNode;
+        fetch(`http://localhost:8080/api/subUnSubDevices/${idUser}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                idDevice,
+                action
+            })
+        }).then(response => response.json())
+        .then(data => {
+            const message = data.message;
+            if (message == 'Action success'){
+                if (action =='sub') {
+                    element.innerHTML = `<button class="btn btn-danger" onclick="subUnsubDevice(${idDevice},${idUser},'unsub')">Hủy kết nối</button>`;
+                    
+
+                }else {
+                    element.innerHTML = `<button class="btn btn-primary" onclick="subUnsubDevice(${idDevice},${idUser},'sub')">Kết nối</button>`;
+                }
+                
+                element.previousElementSibling.textContent = action == 'sub' ? 'Đã kết nối' : 'Chưa kết nối';
+                //showToast(`${action} device has id: ${idDevice} successfully`,'b6eacd');
+                createElementToast(`${action} device has id: ${idDevice} successfully`,'#33ea84',2000);
+                fetch(`http://localhost:8080/api/subUnsubDevices/${idUser}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        localStorage.setItem('allDevices', JSON.stringify(data));
+                        const listAvailableDevices = data.filter(device => !!device.idUser )
+
+                        for (device of listAvailableDevices) {
+                            if (device.id == 1 || device.id == 2 || device.id == 3) {
+                                 sensorDevices.push(device);
+                            } else {
+                                controlDevices.push(device);
+                            }
+                        }
+                        localStorage.setItem('sensorDevices',JSON.stringify(sensorDevices));
+                        localStorage.setItem('controlDevices',JSON.stringify(controlDevices));
+                    })
+            } else {
+                createElementToast(`${action} device has id: ${idDevice} unsuccessfully`,'#dc3545',2000);
+            }
+
+        })
+    }
+    
+
+</script>

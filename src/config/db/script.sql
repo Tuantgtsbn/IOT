@@ -18,6 +18,7 @@ create table devices (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     id_type INT,
     position varchar(255),
+    unit varchar(255),
     name varchar(255),
     src varchar(255),
     status boolean default 0,
@@ -123,4 +124,25 @@ insert into alerts (id_device, message) values
 (3, 'Phát hiện ra khói'),
 (4, 'Lỗi kết nối'),
 (1, 'Cảm biến nhiệt độ bị lỗi');
+
+use smarthome;
+create table subcrible (
+	id int primary key auto_increment,
+    id_user int,
+    id_device int,
+	foreign key (id_user) references users(id),
+    foreign key (id_device) references devices(id)
+);
+
+insert into subcrible (id_user,id_device) values
+(1,1),
+(1,2),
+(1,3),
+(1,4),
+(1,5),
+(2,1),
+(2,2),
+(2,3)
+;
+select d.id as id, d.name as name, d.position as position, d.status as status, t.id_user as idUser from devices as d left join  (select * from subcrible where subcrible.id_user=3) as t on d.id = t.id_device
 

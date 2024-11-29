@@ -1,14 +1,11 @@
 <div class="container content">
     <div class="parent dashboard">
-        <p class="heading">Statistics</p>
+        <p class="heading">Data</p>
         <div class="choice row">
             <div class="list-field col-4 col-md-3">
                 <label for="field" class="form-label"> Select filter</label>
-                <select name="field" id="field" class="form-select">
-                    <option value="" selected>All</option>
-                    <option value="1">Temperature</option>
-                    <option value="2">Humidity</option>
-                    <option value="3">Gas</option>
+                <select name="device" id="device" class="form-select">
+                    <option value="" selected="true">All</option>
                 </select>
             </div>
             <div class="search col-8 col-md-3">
@@ -55,7 +52,7 @@
 </div>
 
 <script>
-   
+    
     document.addEventListener('DOMContentLoaded', function () {
         const queries = {
             idDevice: '',
@@ -64,8 +61,15 @@
             time: '',
         }
         let currentPage = 1;
-        const field = document.querySelector('#field');
+        const field = document.querySelector('#device');
+        const sensorDevices = JSON.parse(localStorage.getItem('sensorDevices'));
         const time = document.querySelector('#date-search');
+        sensorDevices.forEach(device =>{
+            const option = document.createElement('option');
+            option.value = device.id;
+            option.textContent = device.name;
+            field.appendChild(option);
+        })
         field.addEventListener('change', (event) => {
             queries.idDevice = event.target.value;
             queries.page = 1;

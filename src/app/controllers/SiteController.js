@@ -25,6 +25,9 @@ const SiteController = {
 
             })
     },
+    manageDevices(req, res) {
+        res.render('manageDevices', { layout: 'main', 'title': 'Manage Devices', 'css': '/css/manageDevices.css', username: req.session.username, idUser: req.session.userId });
+    },
     // [POST] /login
     async postLogin(req, res) {
         const { email, password } = req.body;

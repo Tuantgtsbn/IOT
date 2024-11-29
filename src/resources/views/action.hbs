@@ -5,9 +5,8 @@
             <div class="list-field col-4 col-md-3">
                 <label for="field" class="form-label"> Select Device</label>
                 <select name="field" id="field" class="form-select">
-                    <option value="" selected>All</option>
-                    <option value="5">LED1</option>
-                    <option value="4">Điều hòa</option>
+                    <option value="" selected ="true">All</option>
+                    
                 </select>
             </div>
             <div class="search col-8 col-md-3">
@@ -69,7 +68,13 @@
         let currentPage =1;
         const field = document.querySelector('#field');
         const time = document.querySelector('#date-search');
-
+        const controlDevices = JSON.parse(localStorage.getItem('controlDevices'));
+        controlDevices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.id;
+            option.textContent = device.name;
+            field.appendChild(option);
+        })
         field.addEventListener('change', function (e) {
             queries.idDevice = e.target.value;
             queries.page = 1;

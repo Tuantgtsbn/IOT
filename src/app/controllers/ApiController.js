@@ -1,7 +1,7 @@
 const SensorData = require('../models/SensorData');
 const Actions = require('../models/Actions.js');
 const Devices = require('../models/Devices.js');
-const Alerts = require('../models/Alerts.js')
+const Alerts = require('../models/Alerts.js');
 const ApiController = {
 
     // GET /sensorsData/:id/:unit/latest
@@ -142,6 +142,34 @@ const ApiController = {
                 return res.status(404).json({ message: 'Data not found' });
             }
             return res.json(result);
+        } catch (error) {
+            console.error('Error: ', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+    async getListDeviceSubUnSub(req, res) {
+        try {
+            const result = await Devices.getListDeviceSubUnSub(req.params.idUser);
+            if (!result || result.length == 0) {
+                return res.status(404).json({ message: 'Data not found' });
+            } else {
+                return res.json(result);
+            }
+        } catch (error) {
+            console.error('Error: ', error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+    async updateDeviceSubUnsub(req, res) {
+        const idUser = req.params.idUser;
+        const { idDevice, action } = req.body;
+        try {
+            const result = await Devices.updateDeviceSubUnsub(idUser, idDevice, action);
+            if (!result) {
+                return res.status(404).json({ message: 'Action faild' });
+            } else {
+                return res.status(200).json({ message: 'Action success' });
+            }
         } catch (error) {
             console.error('Error: ', error);
             res.status(500).json({ message: 'Internal server error' });

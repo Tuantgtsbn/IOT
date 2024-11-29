@@ -38,19 +38,26 @@
     border-bottom-right-radius: 10px;
 }
 
-.connected {
+.box_footer.connected {
     background-color: #62de6a;
 }
-.disconnected {
+.box_footer.disconnected {
     background-color: #f44336;
 }
 .status {
     margin: 0;
     font-size: 1.5rem;
 }
+.row-first {
+    margin-right: 0px;
+    margin-left: 0px;
+}
 .row-second {
     margin-top: 32px;
+    margin-right: 0px;
+    margin-left: 0px;
 }
+
 .control-panel {
     border-radius: 10px;
     padding: 8px 16px;
@@ -62,6 +69,7 @@
 }
 .control-panel-body__device-action{
     text-align: center;
+    display: none;
 }
 
 .device_actived {
@@ -76,10 +84,32 @@
     justify-content: flex-start;
 }
 
-.control-panel-body__device-action {
-    display: none;
-}
 
 #automatic {
     margin-right: 16px;
+}
+
+
+
+.control-panel-body__device.connected {
+    .control-panel-body__device-action {
+        display: block;
+    }
+    .status {
+        display: none;
+    }
+}
+
+.on {
+    button {
+        background-color: #62de6a!important;
+    }
+
+}
+.control-panel-body__device-action button {
+    background-color: #f44336;
+}
+
+#select_device {
+    width: 50%;
 }

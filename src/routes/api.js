@@ -7,6 +7,8 @@ router.get('/sensorsData', apiController.getSensorsData)
 router.get('/devices/:id', apiController.getDevice);
 router.patch('/devices/:id', apiController.updateDevice);
 router.get('/devices', apiController.getDevices);
+router.get('/subUnSubDevices/:idUser', apiController.getListDeviceSubUnSub);
+router.patch('/subUnSubDevices/:idUser', apiController.updateDeviceSubUnsub);
 router.get('/actions', apiController.getActions);
 router.get('/alerts', apiController.getAlerts);
 module.exports = router;

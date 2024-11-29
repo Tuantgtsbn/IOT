@@ -12,7 +12,7 @@ const SensorData = {
         }
     },
     getLatestTenValue: async (id, unit) => {
-        const sql = 'SELECT sensors_data.value, convert_tz(sensors_data.created_at,"+00:00","+07:00") as created_at  FROM sensors_data join devices on sensors_data.id_device=devices.id where devices.id=? order by sensors_data.created_at desc limit 10';
+        const sql = 'SELECT sensors_data.value, devices.unit as unit, devices.name as name, convert_tz(sensors_data.created_at,"+00:00","+07:00") as created_at  FROM sensors_data join devices on sensors_data.id_device=devices.id where devices.id=? order by sensors_data.created_at desc limit 10';
         try {
             const result = await query(sql, [id]);
             result.reverse();

@@ -7,9 +7,7 @@
                     <label for="field" class="form-label"> Select Device</label>
                     <select name="field" id="field" class="form-select">
                         <option value=""selected>All</option>
-                        {{#each devices}}
-                        <option value="{{this.id}}">{{this.name}}</option>
-                        {{/each}}
+                        
                     </select>
                 </div>
                 <div class="sort col-12 col-md-4">
@@ -73,11 +71,25 @@
             date: '',
             sort: 1,
         }
+        const sensorDevices = JSON.parse(localStorage.getItem('sensorDevices'));
+        const controlDevices = JSON.parse(localStorage.getItem('controlDevices'));
         let currentPage =1;
         const field = document.querySelector('#field');
         const time = document.querySelector('#date-search');
         const sort = document.querySelector('#sort');
-
+        sensorDevices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.id;
+            option.textContent = device.name;
+            field.appendChild(option);
+        })
+        controlDevices.forEach(device => {
+            const option = document.createElement('option');
+            option.value = device.id;
+            option.textContent = device.name;
+            field.appendChild(option);
+        })
+        
         field.addEventListener('change', function (e) {
             queries.idDevice = e.target.value;
             queries.page = 1;

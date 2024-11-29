@@ -52,16 +52,20 @@ wss.on('connection', (ws) => {
             if (data.type === 'esp8266' || data.type === 'browser') {
                 if (data.type === 'esp8266') {
                     isESP8266Connected = true;
-                }
 
-                ws.send(JSON.stringify({ type: 'signConnection', status: isESP8266Connected }));
-                if (isESP8266Connected) {
                     wss.clients.forEach((client) => {
                         if (client.clientType === 'browser') {
                             client.send(JSON.stringify({ type: 'signConnection', status: isESP8266Connected }));
                         }
                     });
+
+                } else if (data.type === 'browser') {
+                    ws.idUser = data.idUser;
+                    ws.listDevices = data.listDevices;
+                    ws.send(JSON.stringify({ type: 'signConnection', status: isESP8266Connected }));
                 }
+
+
                 ws.clientType = data.type; // Lưu định danh loại client vào WebSocket instance
                 console.log(`Client type identified: ${ws.clientType}`);
                 return;
@@ -76,7 +80,7 @@ wss.on('connection', (ws) => {
                         var sql = `Insert into sensors_data (id_device, value, unit) values (?, ?, ?)`;
                         db.query(sql, [idDevice, value, unit]);
                         wss.clients.forEach((client) => {
-                            if (client.clientType === 'browser') {
+                            if (client.clientType === 'browser' && client.listDevices.includes(idDevice)) {
                                 client.send(JSON.stringify({ type: 'dataSensor', unit, value, idDevice }));
                             }
                         });
@@ -87,7 +91,7 @@ wss.on('connection', (ws) => {
 
                         db.query(sql, [status, idDevice]);
                         wss.clients.forEach((client) => {
-                            if (client.clientType === 'browser') {
+                            if (client.clientType === 'browser' && client.listDevices.includes(idDevice)) {
                                 client.send(JSON.stringify({ type: 'statusDevice', status, idDevice }));
                             }
                         });
@@ -102,7 +106,7 @@ wss.on('connection', (ws) => {
                         sql = `Insert into action (id_device, id_user, action_type, status) values (?, ?, ?, ?)`;
                         db.query(sql, [idDevice, idUser, currentStatus, isSuccess]);
                         wss.clients.forEach((client) => {
-                            if (client.clientType === 'browser') {
+                            if (client.clientType === 'browser' && client.listDevices.includes(idDevice)) {
                                 client.send(JSON.stringify({ type: 'toggleDevice', currentStatus, idDevice, isSuccess }));
                             }
                         });

@@ -10,4 +10,5 @@ router.get('/alert', isLoggedIn, siteController.alert);
 router.get('/login', siteController.login);
 router.post('/login', siteController.postLogin);
 router.get('/logout', siteController.logout);
+router.get('/manageDevices', isLoggedIn, siteController.manageDevices);
 module.exports = router;
