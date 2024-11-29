@@ -1,6 +1,6 @@
 // Init MySQL connection
 const mysql = require('mysql2/promise');
-require('dotenv').config({ path: 'D:\\LearnWeb\\IOT\\src\\.env' }); // Load file .env vào project
+require('dotenv').config({ path: 'src\\.env' }); // Load file .env vào project
 
 // console.log(process.env);
 const config = {
