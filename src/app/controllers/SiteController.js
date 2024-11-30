@@ -31,13 +31,14 @@ const SiteController = {
     // [POST] /login
     async postLogin(req, res) {
         const { email, password } = req.body;
-        const sql = 'Select * from users where email = ?';
+        const sql = 'Select * from users where email = $1';
         try {
             const result = await query(sql, [email]);
-            if (result.length === 0) {
+            // console.log(result);
+            if (result.rows.length === 0) {
                 res.render('login', { layout: 'noheaderfooter', 'title': 'Login', 'css': '/css/login.css', errorEmail: 'Email is not exist', email, password });
             } else {
-                for (const user of result) {
+                for (const user of result.rows) {
                     if (user.password === password) {
                         req.session.userId = user.id;
                         req.session.username = user.username;

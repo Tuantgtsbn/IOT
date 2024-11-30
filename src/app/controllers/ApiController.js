@@ -25,7 +25,7 @@ const ApiController = {
         const { id } = req.params;
         try {
             const result = await SensorData.getLatestTenValue(id);
-            if (result.length === 0) {
+            if (result == null || result.length === 0) {
                 return res.status(404).json({ message: 'Data not found' });
             }
             return res.json(result);

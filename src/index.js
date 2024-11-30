@@ -22,7 +22,6 @@ const server = app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
 const db = require('./config/db');
-db.connectToDatabase();
 const { sessionConfig } = require('./config/session');
 app.use(sessionConfig);
 routes(app);
@@ -77,7 +76,7 @@ wss.on('connection', (ws) => {
                 switch (data.type) {
                     case 'dataSensor':
                         var { unit, value, idDevice } = data;
-                        var sql = `Insert into sensors_data (id_device, value, unit) values (?, ?, ?)`;
+                        var sql = `Insert into sensors_data (id_device, value, unit) values ($1, $2, $3)`;
                         db.query(sql, [idDevice, value, unit]);
                         wss.clients.forEach((client) => {
                             if (client.clientType === 'browser' && client.listDevices.includes(idDevice)) {
@@ -87,7 +86,7 @@ wss.on('connection', (ws) => {
                         break;
                     case 'statusDevice':
                         var { status, idDevice } = data;
-                        var sql = `Update devices set status = ?, last_updated=current_timestamp where id = ?`;
+                        var sql = `Update devices set status = $1, last_updated=current_timestamp where id = $2`;
 
                         db.query(sql, [status, idDevice]);
                         wss.clients.forEach((client) => {
@@ -99,11 +98,11 @@ wss.on('connection', (ws) => {
                     case 'toggleDevice':
                         var { currentStatus, idDevice, idUser, isSuccess } = data;
                         if (!!isSuccess) {
-                            var sql = `Update devices set status = ?, last_updated=current_timestamp where id = ?`;
+                            var sql = `Update devices set status = $1, last_updated=current_timestamp where id = $2`;
                             db.query(sql, [currentStatus, idDevice]);
 
                         }
-                        sql = `Insert into action (id_device, id_user, action_type, status) values (?, ?, ?, ?)`;
+                        sql = `Insert into action (id_device, id_user, action_type, status) values ($1, $2, $3, $4)`;
                         db.query(sql, [idDevice, idUser, currentStatus, isSuccess]);
                         wss.clients.forEach((client) => {
                             if (client.clientType === 'browser' && client.listDevices.includes(idDevice)) {
@@ -113,10 +112,10 @@ wss.on('connection', (ws) => {
                         break;
                     case 'alertDevice':
                         var { status, idDevice, message: m } = data;
-                        var sql = `Insert into alerts (id_device, message, isSafe) values (?, ?, ?)`;
+                        var sql = `Insert into alerts (id_device, message, isSafe) values ($1, $2, $3)`;
                         db.query(sql, [idDevice, m, status]);
                         if (idDevice != 3) {
-                            sql = `Update devices set status = ?, last_updated=current_timestamp where id = ?`;
+                            sql = `Update devices set status = $1, last_updated=current_timestamp where id = $2`;
                             db.query(sql, [status, idDevice]);
                         }
 
@@ -135,9 +134,9 @@ wss.on('connection', (ws) => {
                     case 'toggleDeviceAutomatic':
                         var { currentStatus, idDevice, isSuccess } = data;
 
-                        var sql = `Insert into action (id_device, action_type, status) values (?, ?, ?)`;
+                        var sql = `Insert into action (id_device, action_type, status) values ($1, $2, $3)`;
                         db.query(sql, [idDevice, currentStatus, isSuccess]);
-                        sql = `Update devices set status = ?, last_updated=current_timestamp where id = ?`;
+                        sql = `Update devices set status = $1, last_updated=current_timestamp where id = $2`;
                         db.query(sql, [currentStatus, idDevice]);
                         break;
 
