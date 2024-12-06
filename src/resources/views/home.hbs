@@ -32,6 +32,9 @@
 <!-- views/yourPage.handlebars -->
 <script>
 const idUser = `{{idUser}}`;
+const url = `{{baseURL}}`;
+const parsedURL = new URL(url);
+const hostName = parsedURL.hostname;
   var isESPCONNECTED = false;
     
    /* document.querySelector('input#automatic').addEventListener('change', function() {
@@ -46,7 +49,7 @@ const idUser = `{{idUser}}`;
     // get list device are subcribed
 
     async function getLatestValue(idDevice) {
-      const response = await fetch(`{{baseURL}}/api/sensorsData/${idDevice}/latest`);
+      const response = await fetch(`${url}/api/sensorsData/${idDevice}/latest`);
       const data = await response.json();
       return data;
        
@@ -62,7 +65,7 @@ const idUser = `{{idUser}}`;
     let sensorDevices = [];
     let controlDevices = [];
     let idSubDevices = [];
-    fetch(`{{baseURL}}/api/subUnSubDevices/${idUser}`)
+    fetch(`${url}/api/subUnSubDevices/${idUser}`)
       .then(response => response.json())
       .then(data => {
         localStorage.setItem('allDevices', JSON.stringify(data));
@@ -88,7 +91,7 @@ const idUser = `{{idUser}}`;
                 option.selected = true;
               }
               select_device.appendChild(option);
-          fetch(`{{baseURL}}/api/sensorsData/${device.id}/latest`)
+          fetch(`${url}/api/sensorsData/${device.id}/latest`)
             .then(response => response.json())
             .then(data => {
               const div = document.createElement('div');
@@ -189,7 +192,7 @@ const idUser = `{{idUser}}`;
     
         showChart(select_device.value);
     // update chart
-        const ws = new WebSocket('ws://localhost:8080');
+        const ws = new WebSocket(`wss://${hostName}`);
         ws.onopen = function() {
           console.log('Connected to the WS Server');
           ws.send(JSON.stringify({type: 'browser', idUser: idUser,listDevices: idSubDevices}));
@@ -229,7 +232,7 @@ const idUser = `{{idUser}}`;
               var {status, idDevice} = data;
               if(listSensorDevicesElement[idDevice]) {
                 if (status ==0) {
-                  fetch(`{{baseURL}}/api/sensorsData/${idDevice}/latest`)
+                  fetch(`${url}/api/sensorsData/${idDevice}/latest`)
                     .then(response => response.json())
                     .then(data => {
                       const {value, created_at, unit} = data;
@@ -308,7 +311,7 @@ const idUser = `{{idUser}}`;
           })
         })
         function showChart(dataId) {
-      fetch(`{{baseURL}}/api/sensorsData/${dataId}/latestTen`)
+      fetch(`${url}/api/sensorsData/${dataId}/latestTen`)
         .then(response => response.json())
         .then(data => {
           const labels = data.map(item => {
@@ -365,7 +368,7 @@ const idUser = `{{idUser}}`;
 
     }
     function updateChart(dataId) {
-      fetch(`{{baseURL}}/api/sensorsData/${dataId}/latestTen`)
+      fetch(`${url}/api/sensorsData/${dataId}/latestTen`)
         .then(response => response.json())
         .then(data => {
           ecgChart.data.labels = data.map(item => {

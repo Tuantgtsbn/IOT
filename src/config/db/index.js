@@ -54,7 +54,7 @@ const pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
-    port: 5432, // Cổng mặc định của PostgreSQL là 5432
+    port: process.env.DB_PORT, // Cổng mặc định của PostgreSQL là 5432
     max: 10, // Số kết nối tối đa trong pool
     idleTimeoutMillis: 30000, // Thời gian chờ tối đa trước khi đóng kết nối
     connectionTimeoutMillis: 2000,
