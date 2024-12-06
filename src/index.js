@@ -1,3 +1,4 @@
+require('dotenv').config({ path: __dirname + '/.env' });
 const express = require('express');
 const app = express();
 const WebSocket = require('ws');
@@ -7,7 +8,7 @@ const { engine } = require('express-handlebars');
 app.engine('.hbs', engine({ extname: '.hbs' }));
 app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'resources', 'views'));
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const cors = require('cors');
 //Middleware CORS
 app.use(cors());
@@ -19,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const { routes } = require('./routes');
 // Tạo server HTTP
 const server = app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on ${process.env.BASE_URL}`);
 });
 const db = require('./config/db');
 const { sessionConfig } = require('./config/session');

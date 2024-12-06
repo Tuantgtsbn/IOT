@@ -116,7 +116,7 @@
         })
 
         function updateTable (queryString) {
-            fetch(`http://localhost:8080/api/alerts?${queryString}`)
+            fetch(`{{baseURL}}/api/alerts?${queryString}`)
                 .then(response => response.json())
                 .then(data => {
                     const table = document.querySelector('.table-data tbody');

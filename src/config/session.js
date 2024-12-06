@@ -27,7 +27,7 @@ const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 const crypto = require('crypto');
-require('dotenv').config({ path: 'src\\.env' }); // Load file .env
+
 // Cấu hình kết nối PostgreSQL
 const pool = new Pool({
     host: process.env.DB_HOST,

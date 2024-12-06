@@ -87,7 +87,7 @@
     }
     function subUnsubDevice (idDevice,idUser,action) {
         const element = event.target.parentNode;
-        fetch(`http://localhost:8080/api/subUnSubDevices/${idUser}`, {
+        fetch(`{{baseURL}}/api/subUnSubDevices/${idUser}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -111,7 +111,7 @@
                 element.previousElementSibling.textContent = action == 'sub' ? 'Đã kết nối' : 'Chưa kết nối';
                 //showToast(`${action} device has id: ${idDevice} successfully`,'b6eacd');
                 createElementToast(`${action} device has id: ${idDevice} successfully`,'#33ea84',2000);
-                fetch(`http://localhost:8080/api/subUnsubDevices/${idUser}`)
+                fetch(`{{baseURL}}/api/subUnsubDevices/${idUser}`)
                     .then(response => response.json())
                     .then(data => {
                         localStorage.setItem('allDevices', JSON.stringify(data));

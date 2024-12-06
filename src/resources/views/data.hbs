@@ -87,7 +87,7 @@
 
 // Hàm cập nhật bảng dữ liệu
 function updateTable(queryString) {
-    fetch(`http://localhost:8080/api/sensorsData?${queryString}`)
+    fetch(`{{baseURL}}/api/sensorsData?${queryString}`)
         .then(response => response.json())
         .then(data => {
             const table = document.querySelector('.table-data tbody');

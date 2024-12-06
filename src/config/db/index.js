@@ -46,7 +46,7 @@
 // };
 
 const { Pool } = require('pg'); // Thư viện PostgreSQL
-require('dotenv').config({ path: 'src\\.env' }); // Load file .env
+
 
 // Cấu hình kết nối
 const pool = new Pool({
