@@ -152,6 +152,11 @@ wss.on('connection', (ws) => {
                         db.query(sql, [idDevice, currentStatus, isSuccess]);
                         sql = `Update devices set status = $1, last_updated=current_timestamp where id = $2`;
                         db.query(sql, [currentStatus, idDevice]);
+                        wss.clients.forEach((client) => {
+                            if (client.clientType === 'browser' && client.listDevices.includes(idDevice)) {
+                                client.send(JSON.stringify({ type: 'toggleDeviceAutomatic', currentStatus, idDevice, isSuccess }));
+                            }
+                        });
                         break;
 
 

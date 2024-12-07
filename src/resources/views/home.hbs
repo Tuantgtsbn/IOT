@@ -286,6 +286,29 @@ const hostName = parsedURL.hostname;
                   element.classList.toggle('connected', false);
                   element.classList.toggle('disconnected', true);
                 });
+                Object.entries(listSensorDevicesElement).forEach((idDevice, element) => {
+                  fetch(`${url}/api/sensorsData/${idDevice}/latest`)
+                    .then(response => response.json())
+                    .then(data => {
+                      const {value, created_at, unit} = data;
+                      const e = element;
+                      e.querySelector('.status').textContent = 'Disconnected';
+                      e.querySelector('.created_at').textContent = created_at;
+                      e.querySelector('.box_footer').classList.toggle('connected', false);
+                      e.querySelector('.box_footer').classList.toggle('disconnected', true);
+                      switch(unit) {
+                        case 'celsius':
+                          e.querySelector('.value').textContent = `${value} °C`;
+                          break;
+                        case 'percent':
+                          e.querySelector('.value').textContent = `${value} %`;
+                          break;
+                        case 'ppm':
+                          e.querySelector('.value').textContent = `${value} ppm`;
+                          break;
+                      }
+                    })
+                });
               }
               break;
             case 'toggleDevice':
@@ -319,6 +342,18 @@ const hostName = parsedURL.hostname;
                 }
               }
               break;
+            case 'toggleDeviceAutomatic':
+              var {status, idDevice, isSuccess, currentStatus} = data;
+              if(!isSuccess) {
+                alert('Failed to toggle device automatic');
+              } else {
+                if(listControlDevicesElement[idDevice]){
+                  const e = listControlDevicesElement[idDevice];
+                  e.classList.toggle('on', !!currentStatus);
+                  e.querySelector('button').textContent = currentStatus?'ON':'OFF';
+                }
+              }
+              break;
             default:
               throw new Error('Invalid type');
                 
@@ -336,6 +371,7 @@ const hostName = parsedURL.hostname;
           element.querySelector('button').addEventListener('click', function() {
             const idDevice = this.getAttribute('data-id');
             const status = this.classList.contains('on');
+            console.log(status);
             ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: status?0:1}));
           })
         })
