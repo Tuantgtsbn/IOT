@@ -141,6 +141,9 @@ const hostName = parsedURL.hostname;
               div.querySelector('input.automatic').checked = true;
               div.querySelector('button').setAttribute('disabled','true');
             }
+            if(device.status) {
+              div.classList.toggle('on', true);
+            }
             listControlDevicesElement[device.id]=div;
             containerControlDevices.appendChild(div);
           } else if (device.name == 'Đèn') {
@@ -162,6 +165,9 @@ const hostName = parsedURL.hostname;
             
               </div>
             `;
+            if(device.status) {
+              div.classList.toggle('on', true);
+            }
             listControlDevicesElement[device.id]=div;
 
             containerControlDevices.appendChild(div);
@@ -370,7 +376,7 @@ const hostName = parsedURL.hostname;
         Object.values(listControlDevicesElement).forEach(element => {
           element.querySelector('button').addEventListener('click', function() {
             const idDevice = this.getAttribute('data-id');
-            const status = this.currentTarget.classList.contains('on');
+            const status = element.contains('on');
             console.log(idDevice, status);
             ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: status?0:1}));
           })
