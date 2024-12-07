@@ -2,7 +2,7 @@ const { query } = require('../../config/db');
 // const { getDevice, updateDevice } = require('../controllers/ApiController');
 const SensorData = {
     getLatestValue: async (id) => {
-        const sql = 'SELECT sensors_data.value,devices.status,sensors_data.created_at FROM sensors_data join devices on sensors_data.id_device=devices.id where devices.id=$1 order by sensors_data.created_at desc limit 1';
+        const sql = "SELECT sensors_data.value,devices.status,sensors_data.created_at at time zone 'utc' at time zone 'asia/ho_chi_minh' as created_at FROM sensors_data join devices on sensors_data.id_device=devices.id where devices.id=$1 order by sensors_data.created_at desc limit 1";
         try {
             const result = await query(sql, [id]);
             return result.rows[0];
@@ -12,7 +12,7 @@ const SensorData = {
         }
     },
     getLatestTenValue: async (id, unit) => {
-        const sql = 'SELECT sensors_data.value, devices.unit as unit, devices.name as name, sensors_data.created_at  FROM sensors_data join devices on sensors_data.id_device=devices.id where devices.id=$1 order by sensors_data.created_at desc limit 10';
+        const sql = "SELECT sensors_data.value, devices.unit as unit, devices.name as name, sensors_data.created_at at time zone 'utc' at time zone 'asia/ho_chi_minh' as created_at FROM sensors_data join devices on sensors_data.id_device=devices.id where devices.id=$1 order by sensors_data.created_at desc limit 10";
         try {
             const result = await query(sql, [id]);
             console.log(result.rows);
@@ -58,15 +58,15 @@ const SensorData = {
         //const sql = 'SELECT sensors_data.value, convert_tz(sensors_data.created_at,"+00:00","+07:00") as created_at, devices.name FROM sensors_data join devices on sensors_data.id_device=devices.id where devices.id=? and sensors_data.created_at>=? order by sensors_data.created_at desc limit ?,?';
         if (time) {
             if (idDevice) {
-                sqlStart = `SELECT value,unit, created_at from sensors_data where id_device=${idDevice} and created_at::date = '${time}'::date`;
+                sqlStart = `SELECT value,unit, created_at at time zone 'utc' at time zone 'asia/ho_chi_minh'as created_at from sensors_data where id_device=${idDevice} and created_at::date = '${time}'::date`;
             } else {
-                sqlStart = `SELECT value,unit, created_at from sensors_data where created_at::date = '${time}'::date`;
+                sqlStart = `SELECT value,unit, created_at at time zone 'utc' at time zone 'asia/ho_chi_minh' as created_at from sensors_data where created_at::date = '${time}'::date`;
             }
         } else {
             if (idDevice) {
-                sqlStart = `SELECT value,unit, created_at from sensors_data where id_device=${idDevice}`;
+                sqlStart = `SELECT value,unit, created_at at time zone 'utc' at time zone 'asia/ho_chi_minh' as created_at from sensors_data where id_device=${idDevice}`;
             } else {
-                sqlStart = `SELECT value,unit, created_at from sensors_data`;
+                sqlStart = `SELECT value,unit, created_at at time zone 'utc' at time zone 'asia/ho_chi_minh' as created_at from sensors_data`;
             }
         }
 

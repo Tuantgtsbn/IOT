@@ -50,12 +50,14 @@ wss.on('connection', (ws) => {
 
             // Kiểm tra xem đây có phải là tin nhắn xác định loại client không
             if (data.type === 'esp8266' || data.type === 'browser') {
+                ws.clientType = data.type; // Lưu định danh loại client vào WebSocket instance
+                console.log(`Client type identified: ${ws.clientType}`);
                 if (data.type === 'esp8266') {
                     isESP8266Connected = true;
 
                     wss.clients.forEach((client) => {
                         if (client.clientType === 'browser') {
-                            client.send(JSON.stringify({ type: 'signConnection', status: isESP8266Connected }));
+                            client.send(JSON.stringify({ type: 'signConnection', status: true }));
                         }
                     });
 
@@ -66,8 +68,7 @@ wss.on('connection', (ws) => {
                 }
 
 
-                ws.clientType = data.type; // Lưu định danh loại client vào WebSocket instance
-                console.log(`Client type identified: ${ws.clientType}`);
+
                 return;
             }
 
@@ -148,19 +149,20 @@ wss.on('connection', (ws) => {
                 console.log('Received from browser:', data);
                 switch (data.type) {
                     case 'toggleDevice':
-                        var { idDevice, currentStatus, idUser } = data;
+                        var { idDevice, neededStatus, idUser } = data;
                         wss.clients.forEach((client) => {
                             if (client.clientType === 'esp8266') {
-                                client.send(JSON.stringify({ type: 'toggleDevice', currentStatus, idUser, idDevice }));
+                                client.send(JSON.stringify({ type: 'toggleDevice', neededStatus, idUser, idDevice }));
                             }
                         });
                         break;
                     case 'automatic':
                         var { status, idDevice } = data;
+                        var sql = `Update devices set isAutomatic = $1 where id = $2`;
+                        db.query(sql, [status, idDevice]);
                         wss.clients.forEach((client) => {
-                            if (client.clientType === 'esp8266') {
-                                client.send(JSON.stringify({ type: 'automatic', status, idDevice }));
-                            }
+                            if (client === ws) return;
+                            client.send(JSON.stringify({ type: 'automatic', status, idDevice }));
                         });
                 }
             }

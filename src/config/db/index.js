@@ -58,6 +58,7 @@ const pool = new Pool({
     max: 10, // Số kết nối tối đa trong pool
     idleTimeoutMillis: 30000, // Thời gian chờ tối đa trước khi đóng kết nối
     connectionTimeoutMillis: 2000,
+
     ssl: {
         rejectUnauthorized: false, // Tùy chọn này cho phép kết nối ngay cả khi không kiểm tra chứng chỉ
     }, // Thời gian chờ kết nối

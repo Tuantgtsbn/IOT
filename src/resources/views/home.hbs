@@ -126,18 +126,21 @@ const hostName = parsedURL.hostname;
               
               <p class="control-panel-body__device-name col-12"></p>
               <div class="control-panel-body__device-img col-12">
-                <object data="/svg/light.svg" type="image/svg+xml" style="width:100%"></object>
-
+                <object data="/svg/air_conditioner.svg" type="image/svg+xml" style="width:100%"></object>
               </div>
               <p class="status">Connecting...</p>
               <div class="control-panel-body__device-action col-12">
                   <label for="automatic">Automatic</label>
                   <input type="checkbox" name="" class="automatic">
-                  <button class="btn" data-id="${device.id}"></button>
+                  <button class="btn" data-id="${device.id}">${device.status?"ON":"OFF"}</button>
 
             
               </div>
             `
+            if(device.isautomatic) {
+              div.querySelector('input.automatic').checked = true;
+              div.querySelector('button').setAttribute('disabled','true');
+            }
             listControlDevicesElement[device.id]=div;
             containerControlDevices.appendChild(div);
           } else if (device.name == 'Đèn') {
@@ -147,13 +150,14 @@ const hostName = parsedURL.hostname;
             div.innerHTML = `
               <p class="control-panel-body__device-name col-12"></p>
               <div class="control-panel-body__device-img col-12">
-                <object data="/svg/air_conditioner.svg" type="image/svg+xml" style="width:100%"></object>
+                
+                <object data="/svg/light.svg" type="image/svg+xml" style="width:100%"></object>
 
               </div>
               <p class="status">Connecting...</p>
               <div class="control-panel-body__device-action col-12">
                 
-                  <button class="btn" data-id="${device.id}"></button>
+                  <button class="btn" data-id="${device.id}">${device.status?"ON":"OFF"}</button>
 
             
               </div>
@@ -168,12 +172,19 @@ const hostName = parsedURL.hostname;
           if(element.querySelector('input.automatic') ) {
             element.querySelector('input.automatic').addEventListener('change', function() {
               const idDevice = this.nextElementSibling.getAttribute('data-id');
-              ws.send(JSON.stringify({type: 'automatic', status: this.checked, idDevice: idDevice}));
+              for(i=0; i < controlDevices.length; i++) {
+                if(controlDevices[i].id == idDevice) {
+                  controlDevices[i].isautomatic = this.checked?1:0;
+                  localStorage.setItem('controlDevices',JSON.stringify(controlDevices));
+                }
+              }
+              ws.send(JSON.stringify({type: 'automatic', status: this.checked?1:0, idDevice: idDevice}));
               if (this.checked) {
                 this.nextElementSibling.setAttribute('disabled','true');
               } else {
                 this.nextElementSibling.removeAttribute('disabled');
               }
+
             });
           }
         })
@@ -204,7 +215,6 @@ const hostName = parsedURL.hostname;
             case 'dataSensor':
               var {value, unit, idDevice} = data;
                   const e = listSensorDevicesElement[idDevice];
-                  console.log(e);
                   e.querySelector('.status').textContent = 'Connected';
                   e.querySelector('.created_at').textContent = '';
                   e.querySelector('.box_footer').classList.toggle('connected', true);
@@ -290,6 +300,25 @@ const hostName = parsedURL.hostname;
                   }
               }
               break;
+            case 'automatic':
+              var {status, idDevice} = data;
+              if(listControlDevicesElement[idDevice]){
+                const e = listControlDevicesElement[idDevice];
+                e.querySelector('input.automatic').checked = status;
+                if (status) {
+                  e.querySelector('input.automatic').nextElementSibling.setAttribute('disabled','true');
+                } else {
+                  e.querySelector('input.automatic').nextElementSibling.removeAttribute('disabled');
+                }
+                for (i=0; i < controlDevices.length; i++) {
+                  if(controlDevices[i].id == idDevice) {
+                    controlDevices[i].isautomatic = status?1:0;
+                    localStorage.setItem('controlDevices',JSON.stringify(controlDevices));
+                  }
+
+                }
+              }
+              break;
             default:
               throw new Error('Invalid type');
                 
@@ -307,7 +336,7 @@ const hostName = parsedURL.hostname;
           element.querySelector('button').addEventListener('click', function() {
             const idDevice = this.getAttribute('data-id');
             const status = this.classList.contains('on');
-            ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, currentStatus: status?1:0}));
+            ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: !status}));
           })
         })
         function showChart(dataId) {

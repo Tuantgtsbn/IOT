@@ -3,7 +3,7 @@ const Actions = {
     getActions: async function (conditions) {
 
         const { page, time, idDevice, limit } = conditions;
-        let sqlStart = `SELECT users.username as user, devices.name as device, action.action_type as action_type, action.status as status, action.created_at
+        let sqlStart = `SELECT users.username as user, devices.name as device, action.action_type as action_type, action.status as status, action.created_at at time zone 'utc' at time zone 'asia/ho_chi_minh' as created_at
             FROM action inner join devices on action.id_device = devices.id inner join users on action.id_user = users.id`;
         const sqlEnd = `ORDER BY action.created_at DESC LIMIT ${limit} OFFSET ${(page - 1) * limit}`;
         if (time) {

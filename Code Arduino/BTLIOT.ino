@@ -13,10 +13,10 @@ DHT dht(DHT_PIN, DHTTYPE);  // Tạo đối tượng DHT
 #define BUZZER_PIN D6
 //LED 1 (đại diện cho điều hòa)
 #define LED1_PIN D3
+int led1Status = 0;
 //LED2 (đại diện cho đèn lED)
 #define LED2_PIN D5
-int led1Status = false;
-int led2Status = false;
+int led2Status = 0;
 int priority = 1;
 // Ngưỡng nồng độ khí gas (giá trị từ 0 đến 1023, có thể điều chỉnh)
 int gasThreshold = 400;
@@ -27,7 +27,7 @@ String ssid = ""; // Tên đăng nhập wifi
 String password = ""; // Mật khẩu mạng wifi
 String host = ""; // Địa chỉ ip máy tính chạy server
 uint16_t port = 0; // Cổng
-String zapier_webhook_url = "https://hooks.zapier.com/hooks/catch/20559867/29zccwh/";
+
 
 // Tạo đối tượng WebSocket
 WebSocketsClient webSocket;
@@ -39,46 +39,61 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
     case WStype_CONNECTED:
       Serial.println("Connected to WebSocket server");
       webSocket.sendTXT("{\"type\":\"esp8266\"}");
+      webSocket.sendTXT("{\"type\":\"statusDevice\",\"status\":0,\"idDevice\":4}");
+      webSocket.sendTXT("{\"type\":\"statusDevice\",\"status\":0,\"idDevice\":5}");
       break;
     case WStype_TEXT:
       // Sử dụng ArduinoJson để phân tích thông điệp JSON
       StaticJsonDocument<500> doc;
 
       DeserializationError error = deserializeJson(doc, payload);
-      // Nhận yêu cầu tắt/bật đèn
+      
       if (!error) {
         // Kiểm tra giá trị "type" trong message
         String msgType = doc["type"].as<String>();
+        Serial.print("Nhận được message từ server: ");
         Serial.println(msgType);
-        
+        // Nhận yêu cầu tắt/bật đèn
         if (msgType == "toggleDevice") {
           int idDevice = doc["idDevice"].as<int>();
           int idUser = doc["idUser"].as<int>();
+          int neededStatus = doc["neededStatus"].as<int>();
           StaticJsonDocument<500> response;
           String JsonResponse;
           Serial.print("People: ");
           Serial.print(idUser);
-          Serial.print(" want to toggle device: ");
-          Serial.println(idDevice);
+          Serial.print(" want device: ");
+          Serial.print(idDevice);
+          Serial.print(" ");
+          Serial.println(neededStatus ? "ON" : "OFF");
           if (idDevice == 5) {
-            led2Status = !led2Status;
+            if (led2Status == neededStatus) {
+              response["isSuccess"] = 0;
+            } else {
+              led2Status = neededStatus;
+              response["isSuccess"] = 1;
+            }
+            Serial.print("After toggle, ");
             Serial.println(led2Status ? "LED ON" : "LED OFF");
-            
             response["type"] = "toggleDevice";
             response["idDevice"] = 5;
-            response["currentStatus"] = led2Status?1:0;
-            response["isSuccess"] = 1;
+            response["currentStatus"] = led2Status;
             response["idUser"]= idUser;
             serializeJson(response, JsonResponse);
             webSocket.sendTXT(JsonResponse);
             response.clear();
           }else if(idDevice ==4){
-            led1Status = !led1Status;
-            Serial.println(led1Status ? "Air ON" : "Air OFF");
+            if (led1Status == neededStatus) {
+              response["isSuccess"] = 0;
+            } else {
+              led1Status = neededStatus;
+              response["isSuccess"] = 1;
+            }
+            Serial.print("After toggle, ");
+            Serial.println(led1Status ? "Air Conditioner ON" : "Air Conditioner OFF");
             response["type"] = "toggleDevice";
             response["idDevice"] = 4;
-            response["currentStatus"] = led1Status ?1:0;
-            response["isSuccess"] = 1;
+            response["currentStatus"] = led1Status;
             response["idUser"]= idUser;
             serializeJson(response, JsonResponse);
             webSocket.sendTXT(JsonResponse);
@@ -88,13 +103,12 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
           int idDevice = doc["idDevice"].as<int>();
           bool status = doc["status"].as<bool>();
           priority = status ? 0 : 1;
-          Serial.print("Priority of ");
+          Serial.print("Device has id: ");
           Serial.print(idDevice);
           Serial.print(": ");
-          Serial.println(priority);
+          Serial.println(priority?"Manual":"Automatic");
         }
       } else {
-
         Serial.println("Failed to parse message as JSON");
       }
       break;
@@ -137,7 +151,6 @@ void loop() {
   webSocket.loop();
 
   unsigned long currentMillis = millis();  // Lấy thời gian hiện tại
-  // Gửi dữ liệu từ cảm biến DHT11 mỗi 1000 ms
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;  // Cập nhật thời gian trước đó
 
@@ -179,8 +192,8 @@ void loop() {
       doc["unit"] = "celsius";
       doc["value"] = temperature;
       doc["idDevice"] = 1;
-      if (temperature > 30 && led1Status == false && priority == 0) {
-        led1Status = true;
+      if (temperature > 30 && led1Status == 0 && priority == 0) {
+        led1Status = 1;
         docAction["type"] = "toggleDeviceAutomatic";
         docAction["currentStatus"] = 1;
         docAction["idDevice"] = 4;
@@ -190,8 +203,8 @@ void loop() {
         docAction.clear();
         
         
-      } else if (temperature < 30 && led1Status == true && priority == 0) {
-        led1Status = false;
+      } else if (temperature < 28 && led1Status == 1 && priority == 0) {
+        led1Status = 0;
         docAction["type"] = "toggleDeviceAutomatic";
         docAction["currentStatus"] = 0;
         docAction["idDevice"] = 4;
@@ -205,6 +218,7 @@ void loop() {
       Serial.println(temperature);
 
       serializeJson(doc, jsonData);
+      doc.clear();
       //Gửi dữ liệu đo được từ các cảm biến lên server
       webSocket.sendTXT(jsonData);
     } else {
@@ -242,8 +256,8 @@ void loop() {
         webSocket.sendTXT(jsonInfor);
         docInfor.clear();
         docAlert["type"] = "alertDevice";
-        docAlert["status"] = 2;
-        docAlert["idDevice"] = 1;
+        docAlert["status"] = 1;
+        docAlert["idDevice"] = 2;
         docAlert["message"] = "Read humidity successfull.";
         serializeJson(docAlert, jsonAlert);
         Serial.println(jsonAlert);
@@ -259,6 +273,7 @@ void loop() {
       serializeJson(doc, jsonData);
       //Gửi dữ liệu đo được từ các cảm biến lên server
       webSocket.sendTXT(jsonData);
+      doc.clear();
     } else {
       Serial.println("Failed to read from DHT sensor!");
       countHumiError += 1;
@@ -309,6 +324,7 @@ void loop() {
       serializeJson(doc, jsonData);
       //Gửi dữ liệu đo được từ các cảm biến lên server
       webSocket.sendTXT(jsonData);
+      doc.clear();
       //Kiểm tra xem giá trị có vượt ngưỡng không
       if (gasValue > gasThreshold) {
         digitalWrite(BUZZER_PIN, HIGH);  // Bật còi
@@ -321,7 +337,6 @@ void loop() {
         serializeJson(docAlert, jsonAlert);
         webSocket.sendTXT(jsonAlert);
         docAlert.clear();
-        smokeAlert();
       } else {
         digitalWrite(BUZZER_PIN, LOW);  // Tắt còi
       }
@@ -350,54 +365,31 @@ void loop() {
     }
     
 
-    // gửi trạng thái điều hòa
-    docInfor["type"] = "statusDevice";
-    docInfor["idDevice"] = 4;
-    docInfor["status"] = led1Status ? 1 : 0;
-    serializeJson(docInfor, jsonInfor);
-    webSocket.sendTXT(jsonInfor);
-    docInfor.clear();
-    // gửi trạng thái đèn
-    docInfor["type"] = "statusDevice";
-    docInfor["idDevice"] = 5;
-    docInfor["status"] = led2Status ? 1 : 0;
+    // // gửi trạng thái điều hòa
+    // docInfor["type"] = "statusDevice";
+    // docInfor["idDevice"] = 4;
+    // docInfor["status"] = led1Status;
+    // serializeJson(docInfor, jsonInfor);
+    // webSocket.sendTXT(jsonInfor);
+    // docInfor.clear();
+    // // gửi trạng thái đèn
+    // docInfor["type"] = "statusDevice";
+    // docInfor["idDevice"] = 5;
+    // docInfor["status"] = led2Status;
+    // serializeJson(docInfor, jsonInfor);
+    // webSocket.sendTXT(jsonInfor);
+    // docInfor.clear();
     Serial.print("Trạng thái của điều hòa: ");
     Serial.println(led1Status?"ON":"OFF");
     Serial.print("Trạng thái của đèn: ");
     Serial.println(led2Status?"ON":"OFF");
-    serializeJson(docInfor, jsonInfor);
-    webSocket.sendTXT(jsonInfor);
-    docInfor.clear();
     digitalWrite(LED1_PIN, led1Status ? HIGH : LOW);
     digitalWrite(LED2_PIN, led2Status ? HIGH : LOW);
   }
   
   // Chờ 10 giây trước khi đọc và gửi dữ liệu tiếp
 }
-void smokeAlert() {
-  if(WiFi.status() == WL_CONNECTED) {
-    // HTTPClient http;
-    HTTPClient http2;
-    // http.begin(client, zapier_webhook_url);
-    // int httpResponseCode = http.GET();
-    // if(httpResponseCode > 0) {
-    //   Serial.println("Alert sent to Zapier successfull.");
-    // } else {
-    //   Serial.print("Error in sending Zapier");
-    //   Serial.println(httpResponseCode);
-    // }
-    http2.begin(client, "http://api.telegram.org/bot7442157649:AAG-BdVqGkKyztVoLWRpJyMN0UB4vPlXrIA/sendMessage?chat_id=6160625198&text=warning gas in the kitchen");
-    int httpResponseCode = http2.GET();
-    if(httpResponseCode >0) {
-      Serial.println("Alert sent to Telegram successfull.");
-    }else {
-      Serial.print("Error in sending Telegram");
-      Serial.println(httpResponseCode);
-    }
-    // http.end();
-    http2.end();
-  }
-}
+
 void parseInput(String input) {
   int firstComma = input.indexOf(',');
   int secondComma = input.indexOf(',', firstComma + 1);

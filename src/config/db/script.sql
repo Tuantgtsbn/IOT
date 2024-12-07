@@ -1,8 +1,5 @@
-drop database smarthome;
-create database smarthome;
-use smarthome;
 CREATE TABLE users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username VARCHAR(100) UNIQUE,
     password VARCHAR(255),   
     email VARCHAR(255) UNIQUE,
@@ -10,25 +7,26 @@ CREATE TABLE users (
 );
 
 create table type (
-	id INT AUTO_INCREMENT PRIMARY KEY,
+	id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     type varchar(255) unique
 );
 
 create table devices (
-	id INT AUTO_INCREMENT PRIMARY KEY,
+	id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_type INT,
     position varchar(255),
     unit varchar(255),
     name varchar(255),
     src varchar(255),
-    status boolean default 0,
+    status smallint default 0,
+    isAutomatic smallint default 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     foreign key (id_type) references type(id)
 );
 
 CREATE TABLE sensors_data (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_device int,
     value FLOAT,             
     unit VARCHAR(20),        
@@ -36,10 +34,10 @@ CREATE TABLE sensors_data (
     foreign key (id_device) references devices(id)
 );
 create table action (
-	id int auto_increment primary key,
+	id int GENERATED ALWAYS AS IDENTITY primary key,
     id_device int,
-    action_type boolean default 0,
-    status boolean default 1,
+    action_type smallint default 0,
+    status smallint default 1,
     id_user int default 1,
     created_at timestamp default current_timestamp,
     foreign key(id_device) references devices(id),
@@ -48,14 +46,28 @@ create table action (
 
 
 CREATE TABLE alerts (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_device int,
     message TEXT, 
-    isSafe BOOLEAN DEFAULT 0,               
-    is_resolved BOOLEAN DEFAULT 0, 
+    isSafe smallint DEFAULT 0,               
+    is_resolved smallint DEFAULT 0, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     foreign key (id_device) references devices(id)
 );
+
+create table subcrible (
+	id int GENERATED ALWAYS AS IDENTITY primary key,
+    id_user int,
+    id_device int,
+	foreign key (id_user) references users(id),
+    foreign key (id_device) references devices(id)
+);
+CREATE TABLE IF NOT EXISTS session (
+    sid VARCHAR NOT NULL PRIMARY KEY,
+    sess JSONB NOT NULL,
+    expire TIMESTAMP NOT NULL
+);
+
 insert into users (username) values ('esp8266');
 insert into users (username,password,email) values
 ('minhtuan','123456','minhtuan@gmail.com'),
@@ -69,15 +81,14 @@ insert into type(type) values
 ('MQ2'),
 ('LED'),
 ('Điều hòa');
+insert into devices(id_type, position, name, status,src) values
+(1,'Phòng ngủ tầng 2','Cảm biến Nhiệt độ-01',1,'dht11.jpg'),
+(2,'Phòng ngủ tầng 2', 'Cảm biến Độ ẩm-01',1,'dht11.jpg'),
+(3,'Bếp tâng 1','Cảm biến MQ2-01',1,'mq2.jpg'),
+(5,'Phòng ngủ tầng 2','Điều hòa',0,'dieuhoa.jpg'),
+(4,'Phòng ngủ tâng 2','Đèn',0,'led.jpg');
 
-insert into devices(id_type, position, name, status) values
-(1,'Phòng ngủ tầng 2','Cảm biến Nhiệt độ-01',1),
-(2,'Phòng ngủ tầng 2', 'Cảm biến Độ ẩm-01',1),
-(3,'Bếp tâng 1','Cảm biến MQ2-01',1),
-(4,'Phòng ngủ tầng 2','Điều hòa',0),
-(5,'Phòng ngủ tâng 2','Đèn',0);
-
-insert into sensors_data (id_device, value, unit) value
+insert into sensors_data (id_device, value, unit) values
 (1, 46, 'celsius'),
 (2, 55, 'percent'),
 (3, 244,'ppm'),
@@ -109,7 +120,16 @@ insert into sensors_data (id_device, value, unit) value
 (2, 55, 'percent'),
 (3, 244,'ppm')
 ;
-
+insert into subcrible (id_user,id_device) values
+(3,1),
+(3,2),
+(3,3),
+(3,4),
+(3,5),
+(2,1),
+(2,2),
+(2,3)
+;
 
 insert into action (id_device, id_user, action_type) values
 (5,1,1),
@@ -124,25 +144,3 @@ insert into alerts (id_device, message) values
 (3, 'Phát hiện ra khói'),
 (4, 'Lỗi kết nối'),
 (1, 'Cảm biến nhiệt độ bị lỗi');
-
-use smarthome;
-create table subcrible (
-	id int primary key auto_increment,
-    id_user int,
-    id_device int,
-	foreign key (id_user) references users(id),
-    foreign key (id_device) references devices(id)
-);
-
-insert into subcrible (id_user,id_device) values
-(1,1),
-(1,2),
-(1,3),
-(1,4),
-(1,5),
-(2,1),
-(2,2),
-(2,3)
-;
-select d.id as id, d.name as name, d.position as position, d.status as status, t.id_user as idUser from devices as d left join  (select * from subcrible where subcrible.id_user=3) as t on d.id = t.id_device
-

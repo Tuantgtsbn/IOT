@@ -3,8 +3,8 @@ const Alerts = {
     async getAlerts(conditions) {
         const { page, limit, idDevice, time, sort } = conditions;
         //Select , alerts.message as message,  as created_at,    order by created_at ${} offset ${limit * (page-1)} limit ${limit}`;
-        let sqlStart = `SELECT devices.name as device, alerts.isSafe as isSafe,alerts.created_at, alerts.message as message from alerts inner join devices on alerts.id_device = devices.id`;
-        const sqlEnd = `ORDER BY alerts.created_at ${sort == 1 ? 'asc' : 'desc'} LIMIT ${limit} OFFSET ${(page - 1) * limit}`;
+        let sqlStart = `SELECT devices.name as device, alerts.isSafe as isSafe,alerts.created_at at time zone 'utc' at time zone 'asia/ho_chi_minh' as created_at, alerts.message as message from alerts inner join devices on alerts.id_device = devices.id`;
+        const sqlEnd = `ORDER BY created_at ${sort == 1 ? 'asc' : 'desc'} LIMIT ${limit} OFFSET ${(page - 1) * limit}`;
         if (time) {
             if (idDevice) {
                 sqlStart += ` WHERE date(alerts.created_at) ='${time}' AND alerts.id_device = ${idDevice}`;
