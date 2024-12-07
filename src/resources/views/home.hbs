@@ -376,7 +376,7 @@ const hostName = parsedURL.hostname;
         Object.values(listControlDevicesElement).forEach(element => {
           element.querySelector('button').addEventListener('click', function() {
             const idDevice = this.getAttribute('data-id');
-            const status = element.contains('on');
+            const status = element.classList.contains('on');
             console.log(idDevice, status);
             ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: status?0:1}));
           })
