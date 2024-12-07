@@ -372,7 +372,7 @@ const hostName = parsedURL.hostname;
             const idDevice = this.getAttribute('data-id');
             const status = this.classList.contains('on');
             console.log(status);
-            ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: status?0:1}));
+            ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: status?1:0}));
           })
         })
         function showChart(dataId) {
