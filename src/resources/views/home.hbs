@@ -286,7 +286,7 @@ const hostName = parsedURL.hostname;
                   element.classList.toggle('connected', false);
                   element.classList.toggle('disconnected', true);
                 });
-                Object.entries(listSensorDevicesElement).forEach((idDevice, element) => {
+                for (const [idDevice, element] of Object.entries(listSensorDevicesElement)) {
                   fetch(`${url}/api/sensorsData/${idDevice}/latest`)
                     .then(response => response.json())
                     .then(data => {
@@ -308,7 +308,7 @@ const hostName = parsedURL.hostname;
                           break;
                       }
                     })
-                });
+                }
               }
               break;
             case 'toggleDevice':
