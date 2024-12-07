@@ -336,7 +336,7 @@ const hostName = parsedURL.hostname;
           element.querySelector('button').addEventListener('click', function() {
             const idDevice = this.getAttribute('data-id');
             const status = this.classList.contains('on');
-            ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: !status}));
+            ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: status?0:1}));
           })
         })
         function showChart(dataId) {

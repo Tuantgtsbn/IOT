@@ -42,7 +42,19 @@ const wss = new WebSocket.Server({ server });
 var isESP8266Connected = false;
 wss.on('connection', (ws) => {
     console.log('Client connected');
+    ws.on('pong', () => {
+        ws.isAlive = true;
+    })
+    const interval = setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if (ws.clientType == 'esp8266') {
+                if (ws.isAlive === false) return ws.terminate();
+                ws.isAlive = false;
+                ws.ping();
+            }
 
+        });
+    }, 30000);
     ws.on('message', (message) => {
 
         try {
@@ -54,7 +66,7 @@ wss.on('connection', (ws) => {
                 console.log(`Client type identified: ${ws.clientType}`);
                 if (data.type === 'esp8266') {
                     isESP8266Connected = true;
-
+                    ws.isAlive = true;
                     wss.clients.forEach((client) => {
                         if (client.clientType === 'browser') {
                             client.send(JSON.stringify({ type: 'signConnection', status: true }));
@@ -174,6 +186,7 @@ wss.on('connection', (ws) => {
 
     ws.on('close', () => {
         if (ws.clientType === 'esp8266') {
+            clearInterval(interval);
             console.log('ESP8266 disconnected');
             isESP8266Connected = false;
             wss.clients.forEach((client) => {
