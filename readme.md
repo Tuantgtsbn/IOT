@@ -1,7 +1,10 @@
-## 1 Tạo database mysql
+## 1 Tạo database postgresql
 Chạy file script.sql trong `src/config/db`
 ## 2 Chỉnh sửa
-Sửa `require('dotenv').config({ path: 'path_to_your_file_.env' })` thành đường dẫn đầy đủ đến file .env.  <br>
-Chỉnh sửa file `.env` sao cho phù hợp với cơ sở dữ liệu của bạn.
+<li>Chỉnh sửa file <code>.env</code> sao cho phù hợp với cơ sở dữ liệu của bạn</li>
+<li>Thay <code>wss://${hostName}</code> thành <code>ws://${hostname}:8080</code>nếu muốn chạy local</li>
+
 ## 3 Chạy dự án
 Đứng tại thư mục gốc IOT, gõ `npm start`
+## 4 Trang web demo
+[iot.minhtuandev.it.vn](iot.minhtuandev.it.vn)

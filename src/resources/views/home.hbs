@@ -299,7 +299,7 @@ const hostName = parsedURL.hostname;
                       const {value, created_at, unit} = data;
                       const e = element;
                       e.querySelector('.status').textContent = 'Disconnected';
-                      e.querySelector('.created_at').textContent = created_at;
+                      e.querySelector('.created_at').textContent = created_at.split('.')[0].replace('T', ' ');
                       e.querySelector('.box_footer').classList.toggle('connected', false);
                       e.querySelector('.box_footer').classList.toggle('disconnected', true);
                       switch(unit) {
