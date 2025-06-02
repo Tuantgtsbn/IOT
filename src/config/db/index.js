@@ -45,39 +45,39 @@
 //     query
 // };
 
-const { Pool } = require('pg'); // Thư viện PostgreSQL
-
+const { Pool } = require("pg"); // Thư viện PostgreSQL
 
 // Cấu hình kết nối
 const pool = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_DATABASE,
-    port: process.env.DB_PORT, // Cổng mặc định của PostgreSQL là 5432
-    max: 10, // Số kết nối tối đa trong pool
-    idleTimeoutMillis: 30000, // Thời gian chờ tối đa trước khi đóng kết nối
-    connectionTimeoutMillis: 2000,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  port: process.env.DB_PORT, // Cổng mặc định của PostgreSQL là 5432
+  max: 10, // Số kết nối tối đa trong pool
+  idleTimeoutMillis: 30000, // Thời gian chờ tối đa trước khi đóng kết nối
+  connectionTimeoutMillis: 2000,
 
-    ssl: {
-        rejectUnauthorized: false, // Tùy chọn này cho phép kết nối ngay cả khi không kiểm tra chứng chỉ
-    }, // Thời gian chờ kết nối
+  ssl: {
+    rejectUnauthorized: false, // Tùy chọn này cho phép kết nối ngay cả khi không kiểm tra chứng chỉ
+  },
 });
 
 const query = async (sql, params) => {
-    try {
-        const client = await pool.connect(); // Lấy một kết nối từ pool
-        const result = await client.query(sql, params); // Thực thi câu truy vấn
-        client.release(); // Trả kết nối lại pool
-        return result // Trả về kết quả truy vấn
-    } catch (error) {
-        console.error('Error executing query:', error.message);
-        throw error;
-    }
+  try {
+    const client = await pool.connect(); // Lấy một kết nối từ pool
+    console.log("Kết nối đến PostgreSQL thành công");
+    const result = await client.query(sql, params); // Thực thi câu truy vấn
+    client.release(); // Trả kết nối lại pool
+    return result; // Trả về kết quả truy vấn
+  } catch (error) {
+    console.error("Error executing query:", error.message);
+    throw error;
+  }
 };
 
 // Xuất các module để sử dụng trong file khác
 module.exports = {
-    pool: pool,
-    query,
+  pool: pool,
+  query,
 };

@@ -2,7 +2,7 @@
   <div class="parent dashboard">
     <div class="row row-first gap-5 sensorDevices flex-wrap">
 
-      
+
     </div>
     <div class="row row-second justify-content-between ">
 
@@ -18,7 +18,7 @@
         <div class="control-panel">
           <p class="control-panel-heading">Control panel</p>
           <div class="control-panel-body">
-            
+
           </div>
 
         </div>
@@ -31,72 +31,72 @@
 
 <!-- views/yourPage.handlebars -->
 <script>
-const idUser = `{{idUser}}`;
-const url = `{{baseURL}}`;
-const parsedURL = new URL(url);
-const hostName = parsedURL.hostname;
+  const idUser = `{{idUser}}`;
+  const url = `{{baseURL}}`;
+  const parsedURL = new URL(url);
+  const hostName = parsedURL.hostname;
   var isESPCONNECTED = false;
-    
-   /* document.querySelector('input#automatic').addEventListener('change', function() {
-      ws.send(JSON.stringify({type: 'automatic', status: this.checked, idDevice: 4}));
-      if (this.checked) {
-        this.nextElementSibling.setAttribute('disabled','true');
-      } else {
-        this.nextElementSibling.removeAttribute('disabled');
-      }
-    });
-    getLatestValue();*/
-    // get list device are subcribed
 
-    async function getLatestValue(idDevice) {
-      const response = await fetch(`${url}/api/sensorsData/${idDevice}/latest`);
-      const data = await response.json();
-      return data;
-       
-    }
-    const containerSensorDevices = document.querySelector('.sensorDevices');
-    const containerControlDevices = document.querySelector('.control-panel-body');
-    const select_device = document.getElementById('select_device');
-    const menuChart = document.querySelector('.menu-chart');
-    const listSensorDevicesElement = {};
-    const listControlDevicesElement = {};
-    let idInterval;
-    let ecgChart;
-    let sensorDevices = [];
-    let controlDevices = [];
-    let idSubDevices = [];
-    fetch(`${url}/api/subUnSubDevices/${idUser}`)
-      .then(response => response.json())
-      .then(data => {
-        localStorage.setItem('allDevices', JSON.stringify(data));
-        console.log(data);
-        const listAvailableDevices = data.filter(device => !!device.iduser )
+  /* document.querySelector('input#automatic').addEventListener('change', function() {
+     ws.send(JSON.stringify({type: 'automatic', status: this.checked, idDevice: 4}));
+     if (this.checked) {
+       this.nextElementSibling.setAttribute('disabled','true');
+     } else {
+       this.nextElementSibling.removeAttribute('disabled');
+     }
+   });
+   getLatestValue();*/
+  // get list device are subcribed
 
-        for (device of listAvailableDevices) {
-          if (device.id == 1 || device.id == 2 || device.id == 3) {
-            sensorDevices.push(device);
-          } else {
-            controlDevices.push(device);
-          }
+  async function getLatestValue(idDevice) {
+    const response = await fetch(`${url}/api/sensorsData/${idDevice}/latest`);
+    const data = await response.json();
+    return data;
+
+  }
+  const containerSensorDevices = document.querySelector('.sensorDevices');
+  const containerControlDevices = document.querySelector('.control-panel-body');
+  const select_device = document.getElementById('select_device');
+  const menuChart = document.querySelector('.menu-chart');
+  const listSensorDevicesElement = {};
+  const listControlDevicesElement = {};
+  let idInterval;
+  let ecgChart;
+  let sensorDevices = [];
+  let controlDevices = [];
+  let idSubDevices = [];
+  fetch(`${url}/api/subUnSubDevices/${idUser}`)
+    .then(response => response.json())
+    .then(data => {
+      localStorage.setItem('allDevices', JSON.stringify(data));
+      console.log(data);
+      const listAvailableDevices = data.filter(device => !!device.iduser)
+
+      for (device of listAvailableDevices) {
+        if (device.id == 1 || device.id == 2 || device.id == 3) {
+          sensorDevices.push(device);
+        } else {
+          controlDevices.push(device);
         }
-        localStorage.setItem('sensorDevices',JSON.stringify(sensorDevices));
-        localStorage.setItem('controlDevices',JSON.stringify(controlDevices));
-      
-        sensorDevices.forEach((device,index) => {
-          idSubDevices.push(device.id);
-          const option = document.createElement('option');
-              option.value = device.id;
-              option.textContent = device.name;
-              if(index == 0) {
-                option.selected = true;
-              }
-              select_device.appendChild(option);
-          fetch(`${url}/api/sensorsData/${device.id}/latest`)
-            .then(response => response.json())
-            .then(data => {
-              const div = document.createElement('div');
-              div.classList.add('col-12', 'col-md-3', 'box');
-              div.innerHTML = `
+      }
+      localStorage.setItem('sensorDevices', JSON.stringify(sensorDevices));
+      localStorage.setItem('controlDevices', JSON.stringify(controlDevices));
+
+      sensorDevices.forEach((device, index) => {
+        idSubDevices.push(device.id);
+        const option = document.createElement('option');
+        option.value = device.id;
+        option.textContent = device.name;
+        if (index == 0) {
+          option.selected = true;
+        }
+        select_device.appendChild(option);
+        fetch(`${url}/api/sensorsData/${device.id}/latest`)
+          .then(response => response.json())
+          .then(data => {
+            const div = document.createElement('div');
+            div.classList.add('col-12', 'col-md-3', 'box');
+            div.innerHTML = `
               <div class="box_header">
               <h2 class="name">${device.name}</h2>
               <p class="position">${device.position}</p>
@@ -109,20 +109,20 @@ const hostName = parsedURL.hostname;
               <div class="box_footer disconnected">
                 <p class="status ">Disconnected</p>
               </div>`;
-              listSensorDevicesElement[device.id] = div;
-              containerSensorDevices.appendChild(div);
-              
-            })
-          
-        })
+            listSensorDevicesElement[device.id] = div;
+            containerSensorDevices.appendChild(div);
 
-        controlDevices.forEach(device => {
-          idSubDevices.push(device.id);
-          if(device.name == 'Điều hòa') {
-            const div = document.createElement('div');
-            div.classList.add('control-panel-body__device','row',);
-            div.setAttribute('data-id', device.id);
-            div.innerHTML =`
+          })
+
+      })
+
+      controlDevices.forEach(device => {
+        idSubDevices.push(device.id);
+        if (device.name == 'Điều hòa') {
+          const div = document.createElement('div');
+          div.classList.add('control-panel-body__device', 'row',);
+          div.setAttribute('data-id', device.id);
+          div.innerHTML = `
               
               <p class="control-panel-body__device-name col-12"></p>
               <div class="control-panel-body__device-img col-12">
@@ -132,25 +132,25 @@ const hostName = parsedURL.hostname;
               <div class="control-panel-body__device-action col-12">
                   <label for="automatic">Automatic</label>
                   <input type="checkbox" name="" class="automatic">
-                  <button class="btn" data-id="${device.id}">${device.status?"ON":"OFF"}</button>
+                  <button class="btn" data-id="${device.id}">${device.status ? "ON" : "OFF"}</button>
 
             
               </div>
             `
-            if(device.isautomatic) {
-              div.querySelector('input.automatic').checked = true;
-              div.querySelector('button').setAttribute('disabled','true');
-            }
-            if(device.status) {
-              div.classList.toggle('on', true);
-            }
-            listControlDevicesElement[device.id]=div;
-            containerControlDevices.appendChild(div);
-          } else if (device.name == 'Đèn') {
-            const div = document.createElement('div');
-            div.classList.add('control-panel-body__device','row');
-            div.setAttribute('data-id', device.id);
-            div.innerHTML = `
+          if (device.isautomatic) {
+            div.querySelector('input.automatic').checked = true;
+            div.querySelector('button').setAttribute('disabled', 'true');
+          }
+          if (device.status) {
+            div.classList.toggle('on', true);
+          }
+          listControlDevicesElement[device.id] = div;
+          containerControlDevices.appendChild(div);
+        } else if (device.name == 'Đèn') {
+          const div = document.createElement('div');
+          div.classList.add('control-panel-body__device', 'row');
+          div.setAttribute('data-id', device.id);
+          div.innerHTML = `
               <p class="control-panel-body__device-name col-12"></p>
               <div class="control-panel-body__device-img col-12">
                 
@@ -160,305 +160,305 @@ const hostName = parsedURL.hostname;
               <p class="status">Connecting...</p>
               <div class="control-panel-body__device-action col-12">
                 
-                  <button class="btn" data-id="${device.id}">${device.status?"ON":"OFF"}</button>
+                  <button class="btn" data-id="${device.id}">${device.status ? "ON" : "OFF"}</button>
 
             
               </div>
             `;
-            if(device.status) {
-              div.classList.toggle('on', true);
+          if (device.status) {
+            div.classList.toggle('on', true);
+          }
+          listControlDevicesElement[device.id] = div;
+
+          containerControlDevices.appendChild(div);
+        }
+      });
+      console.log(listControlDevicesElement);
+      Object.values(listControlDevicesElement).forEach(element => {
+        if (element.querySelector('input.automatic')) {
+          element.querySelector('input.automatic').addEventListener('change', function () {
+            const idDevice = this.nextElementSibling.getAttribute('data-id');
+            for (i = 0; i < controlDevices.length; i++) {
+              if (controlDevices[i].id == idDevice) {
+                controlDevices[i].isautomatic = this.checked ? 1 : 0;
+                localStorage.setItem('controlDevices', JSON.stringify(controlDevices));
+              }
             }
-            listControlDevicesElement[device.id]=div;
-
-            containerControlDevices.appendChild(div);
-          }
-        });
-        console.log(listControlDevicesElement);
-        Object.values(listControlDevicesElement).forEach(element => {
-          if(element.querySelector('input.automatic') ) {
-            element.querySelector('input.automatic').addEventListener('change', function() {
-              const idDevice = this.nextElementSibling.getAttribute('data-id');
-              for(i=0; i < controlDevices.length; i++) {
-                if(controlDevices[i].id == idDevice) {
-                  controlDevices[i].isautomatic = this.checked?1:0;
-                  localStorage.setItem('controlDevices',JSON.stringify(controlDevices));
-                }
-              }
-              ws.send(JSON.stringify({type: 'automatic', status: this.checked?1:0, idDevice: idDevice}));
-              if (this.checked) {
-                this.nextElementSibling.setAttribute('disabled','true');
-              } else {
-                this.nextElementSibling.removeAttribute('disabled');
-              }
-
-            });
-          }
-        })
-
-        
-    // Lua chon bieu do
-        select_device.addEventListener('change', function() {
-          const dataId = this.value;
-          if(ecgChart) {
-            ecgChart.destroy();
-          }
-          showChart(dataId);
-        })
-    
-    //show chart
-    
-        showChart(select_device.value);
-    // update chart
-        const ws = new WebSocket(`wss://${hostName}`);
-        ws.onopen = function() {
-          console.log('Connected to the WS Server');
-          ws.send(JSON.stringify({type: 'browser', idUser: idUser,listDevices: idSubDevices}));
-        }
-        ws.onmessage = function(message){
-          const data = JSON.parse(message.data);
-          //console.log(data.type);
-          switch (data.type) {
-            case 'dataSensor':
-              var {value, unit, idDevice} = data;
-                  const e = listSensorDevicesElement[idDevice];
-                  e.querySelector('.status').textContent = 'Connected';
-                  e.querySelector('.created_at').textContent = '';
-                  e.querySelector('.box_footer').classList.toggle('connected', true);
-                  e.querySelector('.box_footer').classList.toggle('disconnected', false);
-                  
-                  switch(unit) {
-                    case 'celsius':
-                      e.querySelector('.value').textContent = `${value} °C`;
-                      
-                      break;
-                    case 'percent':
-                      e.querySelector('.value').textContent = `${value} %`;
-                      break;
-                    case 'ppm':
-                      e.querySelector('.value').textContent = `${value} ppm`;
-                      break;
-                  }
-                    
-                    
-                    
-
-            
-              break;
-            case 'statusDevice':
-              var {status, idDevice} = data;
-              if(listSensorDevicesElement[idDevice]) {
-                if (status ==0) {
-                  fetch(`${url}/api/sensorsData/${idDevice}/latest`)
-                    .then(response => response.json())
-                    .then(data => {
-                      const {value, created_at, unit} = data;
-                      const e = listSensorDevicesElement[idDevice];
-                      e.querySelector('.status').textContent = 'Disconnected';
-                      e.querySelector('.created_at').textContent = created_at;
-                      e.querySelector('.box_footer').classList.toggle('connected', false);
-                      e.querySelector('.box_footer').classList.toggle('disconnected', true);
-                      switch(unit) {
-                        case 'celsius':
-                          e.querySelector('.value').textContent = `${value} °C`;
-                          break;
-                        case 'percent':
-                          e.querySelector('.value').textContent = `${value} %`;
-                          break;
-                        case 'ppm':
-                          e.querySelector('.value').textContent = `${value} ppm`;
-                          break;
-                  }
-                          
-                    })
-                }
-              }
-              if(listControlDevicesElement[idDevice]){
-                const e = listControlDevicesElement[idDevice];
-                e.classList.toggle('on', !!status);
-                e.querySelector('button').textContent = status?'ON':'OFF';
-              }
-              break;
-            case 'signConnection' :
-              var {status} = data;
-              isESPCONNECTED = status;
-              console.log('ESP da ket noi??: ',isESPCONNECTED);
-              if (isESPCONNECTED) {
-                Object.values(listControlDevicesElement).forEach(element => {
-                  element.classList.toggle('connected', true);
-                  element.classList.toggle('disconnected', false);
-                });
-              } else {
-                Object.values(listControlDevicesElement).forEach(element => {
-                  element.classList.toggle('connected', false);
-                  element.classList.toggle('disconnected', true);
-                });
-                for (const [idDevice, element] of Object.entries(listSensorDevicesElement)) {
-                  fetch(`${url}/api/sensorsData/${idDevice}/latest`)
-                    .then(response => response.json())
-                    .then(data => {
-                      const {value, created_at, unit} = data;
-                      const e = element;
-                      e.querySelector('.status').textContent = 'Disconnected';
-                      e.querySelector('.created_at').textContent = created_at.split('.')[0].replace('T', ' ');
-                      e.querySelector('.box_footer').classList.toggle('connected', false);
-                      e.querySelector('.box_footer').classList.toggle('disconnected', true);
-                      switch(unit) {
-                        case 'celsius':
-                          e.querySelector('.value').textContent = `${value} °C`;
-                          break;
-                        case 'percent':
-                          e.querySelector('.value').textContent = `${value} %`;
-                          break;
-                        case 'ppm':
-                          e.querySelector('.value').textContent = `${value} ppm`;
-                          break;
-                      }
-                    })
-                }
-              }
-              break;
-            case 'toggleDevice':
-              var {currentStatus, idDevice, isSuccess} = data;
-              if(!isSuccess) {
-                alert('Failed to toggle device');
-              } else {
-                  if(listControlDevicesElement[idDevice]){
-                    const e = listControlDevicesElement[idDevice];
-                    e.classList.toggle('on', !!currentStatus);
-                    e.querySelector('button').textContent = currentStatus?'ON':'OFF';
-                  }
-              }
-              break;
-            case 'automatic':
-              var {status, idDevice} = data;
-              if(listControlDevicesElement[idDevice]){
-                const e = listControlDevicesElement[idDevice];
-                e.querySelector('input.automatic').checked = status;
-                if (status) {
-                  e.querySelector('input.automatic').nextElementSibling.setAttribute('disabled','true');
-                } else {
-                  e.querySelector('input.automatic').nextElementSibling.removeAttribute('disabled');
-                }
-                for (i=0; i < controlDevices.length; i++) {
-                  if(controlDevices[i].id == idDevice) {
-                    controlDevices[i].isautomatic = status?1:0;
-                    localStorage.setItem('controlDevices',JSON.stringify(controlDevices));
-                  }
-
-                }
-              }
-              break;
-            case 'toggleDeviceAutomatic':
-              var {status, idDevice, isSuccess, currentStatus} = data;
-              if(!isSuccess) {
-                alert('Failed to toggle device automatic');
-              } else {
-                if(listControlDevicesElement[idDevice]){
-                  const e = listControlDevicesElement[idDevice];
-                  e.classList.toggle('on', !!currentStatus);
-                  e.querySelector('button').textContent = currentStatus?'ON':'OFF';
-                }
-              }
-              break;
-            default:
-              throw new Error('Invalid type');
-                
-              
-              
-          }
-        }
-        ws.onclose = function() {
-          console.log('Disconnected to the WS Server');
-        }
-        ws.onerror = function(error) {
-          console.log('Error: ', error);
-        }
-        Object.values(listControlDevicesElement).forEach(element => {
-          element.querySelector('button').addEventListener('click', function() {
-            const idDevice = this.getAttribute('data-id');
-            const status = element.classList.contains('on');
-            console.log(idDevice, status);
-            ws.send(JSON.stringify({type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: status?0:1}));
-          })
-        })
-        function showChart(dataId) {
-      fetch(`${url}/api/sensorsData/${dataId}/latestTen`)
-        .then(response => response.json())
-        .then(data => {
-          const labels = data.map(item => {
-            let time = item.created_at.split('T')[1].split('.')[0];
-            return time;
-          })
-          
-          const length = data.length;
-          const config = {
-            type: 'line',
-            data: {
-              labels: labels,
-              datasets: [
-                {
-                  label: `ECG Data ${data[0].name}`,
-                  data: data.map(item => item.value),
-                  borderColor: 'rgba(75,192,192,1)',
-                  borderWidth: 1.5,
-                  fill: false,
-                  tension: 0.1
-                }
-              ]
-            },
-            options: {
-              scales: {
-                x: {
-                  display: true,
-                  title: {
-                    display: true,
-                    text: 'Time'
-                  }
-                },
-                y: {
-                  display: true,
-                  title: {
-                    display: true,
-                    text: `(${data[0].unit})`
-                  }
-                }
-
-              },
-
+            ws.send(JSON.stringify({ type: 'automatic', status: this.checked ? 1 : 0, idDevice: idDevice }));
+            if (this.checked) {
+              this.nextElementSibling.setAttribute('disabled', 'true');
+            } else {
+              this.nextElementSibling.removeAttribute('disabled');
             }
-          };
-          const ctx = document.getElementById('ecgChart').getContext('2d');
-          clearInterval(idInterval);
-          ecgChart = new Chart(ctx, config);
-          if (ecgChart) {
-            idInterval = setInterval(() => {
-              updateChart(dataId);
-            }, 5000);
-          }
-        })
 
-    }
-    function updateChart(dataId) {
-      fetch(`${url}/api/sensorsData/${dataId}/latestTen`)
-        .then(response => response.json())
-        .then(data => {
-          ecgChart.data.labels = data.map(item => {
-            let time = item.created_at.split('T')[1].split('.')[0];
-            return time;
           });
-          ecgChart.data.datasets[0].data = data.map(item => item.value);
-          ecgChart.update('none');
+        }
+      })
+
+
+      // Lua chon bieu do
+      select_device.addEventListener('change', function () {
+        const dataId = this.value;
+        if (ecgChart) {
+          ecgChart.destroy();
+        }
+        showChart(dataId);
+      })
+
+      //show chart
+
+      showChart(select_device.value);
+      // update chart
+      const ws = new WebSocket(`wss://${hostName}`);
+      ws.onopen = function () {
+        console.log('Connected to the WS Server');
+        ws.send(JSON.stringify({ type: 'browser', idUser: idUser, listDevices: idSubDevices }));
+      }
+      ws.onmessage = function (message) {
+        const data = JSON.parse(message.data);
+        //console.log(data.type);
+        switch (data.type) {
+          case 'dataSensor':
+            var { value, unit, idDevice } = data;
+            const e = listSensorDevicesElement[idDevice];
+            e.querySelector('.status').textContent = 'Connected';
+            e.querySelector('.created_at').textContent = '';
+            e.querySelector('.box_footer').classList.toggle('connected', true);
+            e.querySelector('.box_footer').classList.toggle('disconnected', false);
+
+            switch (unit) {
+              case 'celsius':
+                e.querySelector('.value').textContent = `${value} °C`;
+
+                break;
+              case 'percent':
+                e.querySelector('.value').textContent = `${value} %`;
+                break;
+              case 'ppm':
+                e.querySelector('.value').textContent = `${value} ppm`;
+                break;
+            }
+
+
+
+
+
+            break;
+          case 'statusDevice':
+            var { status, idDevice } = data;
+            if (listSensorDevicesElement[idDevice]) {
+              if (status == 0) {
+                fetch(`${url}/api/sensorsData/${idDevice}/latest`)
+                  .then(response => response.json())
+                  .then(data => {
+                    const { value, created_at, unit } = data;
+                    const e = listSensorDevicesElement[idDevice];
+                    e.querySelector('.status').textContent = 'Disconnected';
+                    e.querySelector('.created_at').textContent = created_at;
+                    e.querySelector('.box_footer').classList.toggle('connected', false);
+                    e.querySelector('.box_footer').classList.toggle('disconnected', true);
+                    switch (unit) {
+                      case 'celsius':
+                        e.querySelector('.value').textContent = `${value} °C`;
+                        break;
+                      case 'percent':
+                        e.querySelector('.value').textContent = `${value} %`;
+                        break;
+                      case 'ppm':
+                        e.querySelector('.value').textContent = `${value} ppm`;
+                        break;
+                    }
+
+                  })
+              }
+            }
+            if (listControlDevicesElement[idDevice]) {
+              const e = listControlDevicesElement[idDevice];
+              e.classList.toggle('on', !!status);
+              e.querySelector('button').textContent = status ? 'ON' : 'OFF';
+            }
+            break;
+          case 'signConnection':
+            var { status } = data;
+            isESPCONNECTED = status;
+            console.log('ESP da ket noi??: ', isESPCONNECTED);
+            if (isESPCONNECTED) {
+              Object.values(listControlDevicesElement).forEach(element => {
+                element.classList.toggle('connected', true);
+                element.classList.toggle('disconnected', false);
+              });
+            } else {
+              Object.values(listControlDevicesElement).forEach(element => {
+                element.classList.toggle('connected', false);
+                element.classList.toggle('disconnected', true);
+              });
+              for (const [idDevice, element] of Object.entries(listSensorDevicesElement)) {
+                fetch(`${url}/api/sensorsData/${idDevice}/latest`)
+                  .then(response => response.json())
+                  .then(data => {
+                    const { value, created_at, unit } = data;
+                    const e = element;
+                    e.querySelector('.status').textContent = 'Disconnected';
+                    e.querySelector('.created_at').textContent = created_at.split('.')[0].replace('T', ' ');
+                    e.querySelector('.box_footer').classList.toggle('connected', false);
+                    e.querySelector('.box_footer').classList.toggle('disconnected', true);
+                    switch (unit) {
+                      case 'celsius':
+                        e.querySelector('.value').textContent = `${value} °C`;
+                        break;
+                      case 'percent':
+                        e.querySelector('.value').textContent = `${value} %`;
+                        break;
+                      case 'ppm':
+                        e.querySelector('.value').textContent = `${value} ppm`;
+                        break;
+                    }
+                  })
+              }
+            }
+            break;
+          case 'toggleDevice':
+            var { currentStatus, idDevice, isSuccess } = data;
+            if (!isSuccess) {
+              alert('Failed to toggle device');
+            } else {
+              if (listControlDevicesElement[idDevice]) {
+                const e = listControlDevicesElement[idDevice];
+                e.classList.toggle('on', !!currentStatus);
+                e.querySelector('button').textContent = currentStatus ? 'ON' : 'OFF';
+              }
+            }
+            break;
+          case 'automatic':
+            var { status, idDevice } = data;
+            if (listControlDevicesElement[idDevice]) {
+              const e = listControlDevicesElement[idDevice];
+              e.querySelector('input.automatic').checked = status;
+              if (status) {
+                e.querySelector('input.automatic').nextElementSibling.setAttribute('disabled', 'true');
+              } else {
+                e.querySelector('input.automatic').nextElementSibling.removeAttribute('disabled');
+              }
+              for (i = 0; i < controlDevices.length; i++) {
+                if (controlDevices[i].id == idDevice) {
+                  controlDevices[i].isautomatic = status ? 1 : 0;
+                  localStorage.setItem('controlDevices', JSON.stringify(controlDevices));
+                }
+
+              }
+            }
+            break;
+          case 'toggleDeviceAutomatic':
+            var { status, idDevice, isSuccess, currentStatus } = data;
+            if (!isSuccess) {
+              alert('Failed to toggle device automatic');
+            } else {
+              if (listControlDevicesElement[idDevice]) {
+                const e = listControlDevicesElement[idDevice];
+                e.classList.toggle('on', !!currentStatus);
+                e.querySelector('button').textContent = currentStatus ? 'ON' : 'OFF';
+              }
+            }
+            break;
+          default:
+            throw new Error('Invalid type');
+
+
+
+        }
+      }
+      ws.onclose = function () {
+        console.log('Disconnected to the WS Server');
+      }
+      ws.onerror = function (error) {
+        console.log('Error: ', error);
+      }
+      Object.values(listControlDevicesElement).forEach(element => {
+        element.querySelector('button').addEventListener('click', function () {
+          const idDevice = this.getAttribute('data-id');
+          const status = element.classList.contains('on');
+          console.log(idDevice, status);
+          ws.send(JSON.stringify({ type: 'toggleDevice', idDevice: idDevice, idUser: idUser, neededStatus: status ? 0 : 1 }));
         })
-    }
-        
+      })
+      function showChart(dataId) {
+        fetch(`${url}/api/sensorsData/${dataId}/latestTen`)
+          .then(response => response.json())
+          .then(data => {
+            const labels = data.map(item => {
+              let time = item.created_at.split('T')[1].split('.')[0];
+              return time;
+            })
+
+            const length = data.length;
+            const config = {
+              type: 'line',
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    label: `ECG Data ${data[0].name}`,
+                    data: data.map(item => item.value),
+                    borderColor: 'rgba(75,192,192,1)',
+                    borderWidth: 1.5,
+                    fill: false,
+                    tension: 0.1
+                  }
+                ]
+              },
+              options: {
+                scales: {
+                  x: {
+                    display: true,
+                    title: {
+                      display: true,
+                      text: 'Time'
+                    }
+                  },
+                  y: {
+                    display: true,
+                    title: {
+                      display: true,
+                      text: `(${data[0].unit})`
+                    }
+                  }
+
+                },
+
+              }
+            };
+            const ctx = document.getElementById('ecgChart').getContext('2d');
+            clearInterval(idInterval);
+            ecgChart = new Chart(ctx, config);
+            if (ecgChart) {
+              idInterval = setInterval(() => {
+                updateChart(dataId);
+              }, 5000);
+            }
+          })
+
+      }
+      function updateChart(dataId) {
+        fetch(`${url}/api/sensorsData/${dataId}/latestTen`)
+          .then(response => response.json())
+          .then(data => {
+            ecgChart.data.labels = data.map(item => {
+              let time = item.created_at.split('T')[1].split('.')[0];
+              return time;
+            });
+            ecgChart.data.datasets[0].data = data.map(item => item.value);
+            ecgChart.update('none');
+          })
+      }
+
     })
 
 
-    
-    
-    
 
 
 
-  
+
+
+
+
 </script>
